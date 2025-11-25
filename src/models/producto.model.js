@@ -2,13 +2,30 @@ import { supabase } from "../config/db.js";
 
 // Obtener todos los productos
 export const getAllRepuestos = async () => {
-  const { data, error } = await supabase
-    .from("repuestos")
-    .select("*")
-    .eq("activo", true);
+  let allData = [];
+  let from = 0;
+  const pageSize = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from("repuestos")
+      .select("*")
+      .eq("activo", true)
+      .range(from, from + pageSize - 1);
+    
+    if (error) throw error;
+    
+    if (data && data.length > 0) {
+      allData = allData.concat(data);
+      from += pageSize;
+      hasMore = data.length === pageSize;
+    } else {
+      hasMore = false;
+    }
+  }
   
-  if (error) throw error;
-  return data;
+  return allData;
 };
 
 // Obtener un producto por CB
