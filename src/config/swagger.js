@@ -15,6 +15,10 @@ const options = {
     },
     servers: [
       {
+        url: "https://apimazda.onrender.com",
+        description: "Servidor de producción",
+      },
+      {
         url: "http://localhost:3000",
         description: "Servidor de desarrollo",
       },
