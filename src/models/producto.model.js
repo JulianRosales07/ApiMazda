@@ -33,7 +33,7 @@ export const getRepuestoByCB = async (cb) => {
   const { data, error } = await supabase
     .from("repuestos")
     .select("*")
-    .eq("CB", cb)
+    .eq("cb", cb)
     .single();
   
   if (error) throw error;
@@ -43,38 +43,38 @@ export const getRepuestoByCB = async (cb) => {
 // Crear un nuevo producto
 export const createRepuesto = async (repuesto) => {
   const {
-    CB,
-    CI,
-    PRODUCTO,
-    TIPO,
-    MODELO_ESPECIFICACION,
-    REFERENCIA,
-    MARCA,
-    EXISTENCIAS_INICIALES,
-    STOCK,
-    PRECIO,
-    DESCRIPCION_LARGA,
-    ESTANTE,
-    NIVEL,
+    cb,
+    ci,
+    producto,
+    tipo,
+    modelo_especificacion,
+    referencia,
+    marca,
+    existencias_iniciales,
+    stock,
+    precio,
+    descripcion_larga,
+    estante,
+    nivel,
     usuario_creacion,
   } = repuesto;
 
   const { data, error } = await supabase
     .from("repuestos")
     .insert([{
-      CB,
-      CI,
-      PRODUCTO,
-      TIPO,
-      MODELO_ESPECIFICACION,
-      REFERENCIA,
-      MARCA,
-      EXISTENCIAS_INICIALES,
-      STOCK,
-      PRECIO,
-      DESCRIPCION_LARGA,
-      ESTANTE,
-      NIVEL,
+      cb,
+      ci,
+      producto,
+      tipo,
+      modelo_especificacion,
+      referencia,
+      marca,
+      existencias_iniciales,
+      stock,
+      precio,
+      descripcion_larga,
+      estante,
+      nivel,
       usuario_creacion,
     }])
     .select()
@@ -87,37 +87,37 @@ export const createRepuesto = async (repuesto) => {
 // Actualizar un producto
 export const updateRepuesto = async (cb, repuesto) => {
   const {
-    CI,
-    PRODUCTO,
-    TIPO,
-    MODELO_ESPECIFICACION,
-    REFERENCIA,
-    MARCA,
-    EXISTENCIAS_INICIALES,
-    STOCK,
-    PRECIO,
-    DESCRIPCION_LARGA,
-    ESTANTE,
-    NIVEL,
+    ci,
+    producto,
+    tipo,
+    modelo_especificacion,
+    referencia,
+    marca,
+    existencias_iniciales,
+    stock,
+    precio,
+    descripcion_larga,
+    estante,
+    nivel,
   } = repuesto;
 
   const { data, error } = await supabase
     .from("repuestos")
     .update({
-      CI,
-      PRODUCTO,
-      TIPO,
-      MODELO_ESPECIFICACION,
-      REFERENCIA,
-      MARCA,
-      EXISTENCIAS_INICIALES,
-      STOCK,
-      PRECIO,
-      DESCRIPCION_LARGA,
-      ESTANTE,
-      NIVEL,
+      ci,
+      producto,
+      tipo,
+      modelo_especificacion,
+      referencia,
+      marca,
+      existencias_iniciales,
+      stock,
+      precio,
+      descripcion_larga,
+      estante,
+      nivel,
     })
-    .eq("CB", cb)
+    .eq("cb", cb)
     .select();
   
   if (error) throw error;
@@ -129,7 +129,7 @@ export const deleteRepuesto = async (cb) => {
   const { data, error } = await supabase
     .from("repuestos")
     .update({ activo: false })
-    .eq("CB", cb)
+    .eq("cb", cb)
     .select();
   
   if (error) throw error;

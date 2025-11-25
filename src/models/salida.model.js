@@ -2,13 +2,30 @@ import { supabase } from "../config/db.js";
 
 // Obtener todas las salidas
 export const getAllSalidas = async () => {
-  const { data, error } = await supabase
-    .from("salidas")
-    .select("*")
-    .order("fecha", { ascending: false });
+  let allData = [];
+  let from = 0;
+  const pageSize = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from("salidas")
+      .select("*")
+      .order("fecha", { ascending: false })
+      .range(from, from + pageSize - 1);
+    
+    if (error) throw error;
+    
+    if (data && data.length > 0) {
+      allData = allData.concat(data);
+      from += pageSize;
+      hasMore = data.length === pageSize;
+    } else {
+      hasMore = false;
+    }
+  }
   
-  if (error) throw error;
-  return data;
+  return allData;
 };
 
 // Obtener una salida por número de factura

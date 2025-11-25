@@ -8,7 +8,7 @@ export const getAllProductoProveedor = async () => {
       `
       *,
       proveedores:proveedor_id (nombre_proveedor, cp),
-      repuestos:producto_cb (PRODUCTO)
+      repuestos:producto_cb (producto)
     `
     )
     .eq("activo", true)
@@ -44,7 +44,7 @@ export const getProductosByProveedor = async (proveedor_id) => {
     .select(
       `
       *,
-      repuestos:producto_cb (PRODUCTO, TIPO, MARCA)
+      repuestos:producto_cb (producto, tipo, marca)
     `
     )
     .eq("proveedor_id", proveedor_id)
@@ -94,7 +94,7 @@ export const getComparativaProveedores = async (producto_cb) => {
         es_proveedor_principal,
         fecha_ultima_compra,
         proveedores:proveedor_id (cp, nombre_proveedor),
-        repuestos:producto_cb (PRECIO)
+        repuestos:producto_cb (precio)
       `
       )
       .eq("producto_cb", producto_cb)

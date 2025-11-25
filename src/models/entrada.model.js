@@ -2,13 +2,30 @@ import { supabase } from "../config/db.js";
 
 // Obtener todas las entradas
 export const getAllEntradas = async () => {
-  const { data, error } = await supabase
-    .from("entradas")
-    .select("*")
-    .order("FECHA", { ascending: false });
+  let allData = [];
+  let from = 0;
+  const pageSize = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from("entradas")
+      .select("*")
+      .order("fecha", { ascending: false })
+      .range(from, from + pageSize - 1);
+    
+    if (error) throw error;
+    
+    if (data && data.length > 0) {
+      allData = allData.concat(data);
+      from += pageSize;
+      hasMore = data.length === pageSize;
+    } else {
+      hasMore = false;
+    }
+  }
   
-  if (error) throw error;
-  return data;
+  return allData;
 };
 
 // Obtener una entrada por ID
@@ -16,7 +33,7 @@ export const getEntradaById = async (id) => {
   const { data, error } = await supabase
     .from("entradas")
     .select("*")
-    .eq("ID", id)
+    .eq("id", id)
     .single();
   
   if (error) throw error;
@@ -28,7 +45,7 @@ export const getEntradasByProveedor = async (proveedor) => {
   const { data, error } = await supabase
     .from("entradas")
     .select("*")
-    .ilike("PROVEEDOR", `%${proveedor}%`);
+    .ilike("proveedor", `%${proveedor}%`);
   
   if (error) throw error;
   return data;
@@ -39,7 +56,7 @@ export const getEntradasByCB = async (cb) => {
   const { data, error } = await supabase
     .from("entradas")
     .select("*")
-    .eq("CB", cb);
+    .eq("cb", cb);
   
   if (error) throw error;
   return data;
@@ -50,7 +67,7 @@ export const getEntradasByFecha = async (fecha) => {
   const { data, error } = await supabase
     .from("entradas")
     .select("*")
-    .eq("FECHA", fecha);
+    .eq("fecha", fecha);
   
   if (error) throw error;
   return data;
@@ -59,34 +76,34 @@ export const getEntradasByFecha = async (fecha) => {
 // Crear una nueva entrada
 export const createEntrada = async (entrada) => {
   const {
-    N_FACTURA,
-    PROVEEDOR,
-    FECHA,
-    CB,
-    CI,
-    DESCRIPCION,
-    CANTIDAD,
-    COSTO,
-    VALOR_VENTA,
-    SIIGO,
-    Columna1,
+    n_factura,
+    proveedor,
+    fecha,
+    cb,
+    ci,
+    descripcion,
+    cantidad,
+    costo,
+    valor_venta,
+    siigo,
+    columna1,
     usuario_registro,
   } = entrada;
 
   const { data, error } = await supabase
     .from("entradas")
     .insert([{
-      N_FACTURA,
-      PROVEEDOR,
-      FECHA,
-      CB,
-      CI,
-      DESCRIPCION,
-      CANTIDAD,
-      COSTO,
-      VALOR_VENTA,
-      SIIGO,
-      Columna1,
+      n_factura,
+      proveedor,
+      fecha,
+      cb,
+      ci,
+      descripcion,
+      cantidad,
+      costo,
+      valor_venta,
+      siigo,
+      columna1,
       usuario_registro,
     }])
     .select()
@@ -99,35 +116,35 @@ export const createEntrada = async (entrada) => {
 // Actualizar una entrada
 export const updateEntrada = async (id, entrada) => {
   const {
-    N_FACTURA,
-    PROVEEDOR,
-    FECHA,
-    CB,
-    CI,
-    DESCRIPCION,
-    CANTIDAD,
-    COSTO,
-    VALOR_VENTA,
-    SIIGO,
-    Columna1,
+    n_factura,
+    proveedor,
+    fecha,
+    cb,
+    ci,
+    descripcion,
+    cantidad,
+    costo,
+    valor_venta,
+    siigo,
+    columna1,
   } = entrada;
 
   const { data, error } = await supabase
     .from("entradas")
     .update({
-      N_FACTURA,
-      PROVEEDOR,
-      FECHA,
-      CB,
-      CI,
-      DESCRIPCION,
-      CANTIDAD,
-      COSTO,
-      VALOR_VENTA,
-      SIIGO,
-      Columna1,
+      n_factura,
+      proveedor,
+      fecha,
+      cb,
+      ci,
+      descripcion,
+      cantidad,
+      costo,
+      valor_venta,
+      siigo,
+      columna1,
     })
-    .eq("ID", id)
+    .eq("id", id)
     .select();
 
   if (error) throw error;
@@ -139,7 +156,7 @@ export const deleteEntrada = async (id) => {
   const { data, error } = await supabase
     .from("entradas")
     .delete()
-    .eq("ID", id)
+    .eq("id", id)
     .select();
   
   if (error) throw error;
