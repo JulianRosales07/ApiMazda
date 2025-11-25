@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger.js";
 import repuestoRoutes from "./routes/producto.routes.js";
 import usuarioRoutes from "./routes/usuario.routes.js";
 import salidaRoutes from "./routes/salida.routes.js";
@@ -11,6 +13,9 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Swagger Documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Ruta principal - Mostrar todas las rutas disponibles
 app.get("/", (req, res) => {
