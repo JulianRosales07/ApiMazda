@@ -1,6 +1,6 @@
 import { supabase } from "../config/db.js";
 
-// Obtener todas las entradas
+// Obtener todas las entradas (con paginación automática)
 export const getAllEntradas = async () => {
   let allData = [];
   let from = 0;

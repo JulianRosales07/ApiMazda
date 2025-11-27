@@ -8,6 +8,7 @@ import salidaRoutes from "./routes/salida.routes.js";
 import entradaRoutes from "./routes/entrada.routes.js";
 import proveedorRoutes from "./routes/proveedor.routes.js";
 import productoProveedorRoutes from "./routes/productoProveedor.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
@@ -227,6 +228,7 @@ app.get("/", (req, res) => {
 });
 
 // Rutas
+app.use("/api/auth", authRoutes);
 app.use("/api/repuestos", repuestoRoutes);
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/salidas", salidaRoutes);
