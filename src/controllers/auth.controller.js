@@ -1,19 +1,26 @@
 import bcrypt from "bcryptjs";
-import { getUserByEmailWithPassword } from "../models/auth.model.js";
+import { getUserByIdentifier } from "../models/auth.model.js";
 import { success, error } from "../utils/response.js";
 
 // Login de usuario
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, nombre, username, password } = req.body;
+
+    // El identificador puede ser email, nombre o username
+    const identifier = email || nombre || username;
 
     // Validar campos requeridos
-    if (!email || !password) {
-      return error(res, { message: "Email y password son requeridos" }, 400);
+    if (!identifier || !password) {
+      return error(
+        res,
+        { message: "Email/nombre de usuario y password son requeridos" },
+        400
+      );
     }
 
-    // Buscar usuario por email
-    const usuario = await getUserByEmailWithPassword(email);
+    // Buscar usuario por email o nombre
+    const usuario = await getUserByIdentifier(identifier);
     if (!usuario) {
       return error(res, { message: "Credenciales inválidas" }, 401);
     }

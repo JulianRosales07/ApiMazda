@@ -1,11 +1,13 @@
 import { supabase } from "../config/db.js";
 
-// Obtener usuario por email (incluyendo password para autenticación)
-export const getUserByEmailWithPassword = async (email) => {
+// Obtener usuario por email o nombre (incluyendo password para autenticación)
+export const getUserByIdentifier = async (identifier) => {
+  // Buscar por email o nombre
   const { data, error } = await supabase
     .from("usuarios")
     .select("*")
-    .eq("email", email)
+    .or(`email.eq.${identifier},nombre.eq.${identifier}`)
+    .limit(1)
     .single();
 
   if (error) {
