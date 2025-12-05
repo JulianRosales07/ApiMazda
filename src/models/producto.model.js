@@ -150,15 +150,73 @@ export const searchRepuestos = async (searchParams) => {
     precio_min,
     precio_max,
     stock_min,
-    limit = 100,
+    limit,
   } = searchParams;
 
-  let supabaseQuery = supabase
-    .from("repuestos")
-    .select("*")
-    .eq("activo", true);
+  // Si hay límite específico, hacer consulta simple
+  if (limit) {
+    let supabaseQuery = supabase
+      .from("repuestos")
+      .select("*")
+      .eq("activo", true);
 
-  // Búsqueda por texto general (busca en producto, descripcion_larga, marca, referencia)
+    // Aplicar filtros
+    supabaseQuery = applyFilters(supabaseQuery, searchParams);
+    supabaseQuery = supabaseQuery.limit(limit);
+
+    const { data, error } = await supabaseQuery;
+    if (error) throw error;
+    return data || [];
+  }
+
+  // Sin límite: obtener todos los resultados con paginación
+  let allData = [];
+  let from = 0;
+  const pageSize = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    let supabaseQuery = supabase
+      .from("repuestos")
+      .select("*")
+      .eq("activo", true);
+
+    // Aplicar filtros
+    supabaseQuery = applyFilters(supabaseQuery, searchParams);
+    supabaseQuery = supabaseQuery.range(from, from + pageSize - 1);
+
+    const { data, error } = await supabaseQuery;
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      allData = allData.concat(data);
+      from += pageSize;
+      hasMore = data.length === pageSize;
+    } else {
+      hasMore = false;
+    }
+  }
+
+  return allData;
+};
+
+// Función auxiliar para aplicar filtros
+function applyFilters(supabaseQuery, searchParams) {
+  const {
+    query,
+    cb,
+    ci,
+    tipo,
+    marca,
+    referencia,
+    estante,
+    nivel,
+    precio_min,
+    precio_max,
+    stock_min,
+  } = searchParams;
+
+  // Búsqueda por texto general
   if (query) {
     supabaseQuery = supabaseQuery.or(
       `producto.ilike.%${query}%,descripcion_larga.ilike.%${query}%,marca.ilike.%${query}%,referencia.ilike.%${query}%`
@@ -207,11 +265,5 @@ export const searchRepuestos = async (searchParams) => {
     supabaseQuery = supabaseQuery.gte("stock", stock_min);
   }
 
-  // Limitar resultados
-  supabaseQuery = supabaseQuery.limit(limit);
-
-  const { data, error } = await supabaseQuery;
-
-  if (error) throw error;
-  return data || [];
-};
+  return supabaseQuery;
+}
