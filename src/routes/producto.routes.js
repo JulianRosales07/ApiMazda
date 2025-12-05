@@ -5,9 +5,55 @@ import {
   crearRepuesto,
   actualizarRepuesto,
   eliminarRepuesto,
+  buscarRepuestos,
 } from "../controllers/producto.controller.js";
 
 const router = Router();
+
+/**
+ * @swagger
+ * /api/repuestos/search:
+ *   post:
+ *     summary: Buscar repuestos por múltiples criterios
+ *     tags: [Repuestos]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               query:
+ *                 type: string
+ *                 description: Búsqueda general en producto, descripción, marca, referencia
+ *               cb:
+ *                 type: string
+ *               ci:
+ *                 type: string
+ *               tipo:
+ *                 type: string
+ *               marca:
+ *                 type: string
+ *               referencia:
+ *                 type: string
+ *               estante:
+ *                 type: string
+ *               nivel:
+ *                 type: string
+ *               precio_min:
+ *                 type: number
+ *               precio_max:
+ *                 type: number
+ *               stock_min:
+ *                 type: number
+ *               limit:
+ *                 type: number
+ *                 default: 100
+ *     responses:
+ *       200:
+ *         description: Resultados de búsqueda
+ */
+router.post("/search", buscarRepuestos);
 
 /**
  * @swagger

@@ -4,6 +4,7 @@ import {
   createRepuesto,
   updateRepuesto,
   deleteRepuesto,
+  searchRepuestos,
 } from "../models/producto.model.js";
 import { success, error } from "../utils/response.js";
 
@@ -11,6 +12,16 @@ export const obtenerRepuestos = async (req, res) => {
   try {
     const data = await getAllRepuestos();
     success(res, data);
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+export const buscarRepuestos = async (req, res) => {
+  try {
+    const searchParams = req.body;
+    const data = await searchRepuestos(searchParams);
+    success(res, data, `Se encontraron ${data.length} resultados`);
   } catch (err) {
     error(res, err);
   }

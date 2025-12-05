@@ -135,3 +135,83 @@ export const deleteRepuesto = async (cb) => {
   if (error) throw error;
   return data;
 };
+
+// Buscar repuestos por múltiples criterios
+export const searchRepuestos = async (searchParams) => {
+  const {
+    query,
+    cb,
+    ci,
+    tipo,
+    marca,
+    referencia,
+    estante,
+    nivel,
+    precio_min,
+    precio_max,
+    stock_min,
+    limit = 100,
+  } = searchParams;
+
+  let supabaseQuery = supabase
+    .from("repuestos")
+    .select("*")
+    .eq("activo", true);
+
+  // Búsqueda por texto general (busca en producto, descripcion_larga, marca, referencia)
+  if (query) {
+    supabaseQuery = supabaseQuery.or(
+      `producto.ilike.%${query}%,descripcion_larga.ilike.%${query}%,marca.ilike.%${query}%,referencia.ilike.%${query}%`
+    );
+  }
+
+  // Filtros específicos
+  if (cb) {
+    supabaseQuery = supabaseQuery.ilike("cb", `%${cb}%`);
+  }
+
+  if (ci) {
+    supabaseQuery = supabaseQuery.ilike("ci", `%${ci}%`);
+  }
+
+  if (tipo) {
+    supabaseQuery = supabaseQuery.ilike("tipo", `%${tipo}%`);
+  }
+
+  if (marca) {
+    supabaseQuery = supabaseQuery.ilike("marca", `%${marca}%`);
+  }
+
+  if (referencia) {
+    supabaseQuery = supabaseQuery.ilike("referencia", `%${referencia}%`);
+  }
+
+  if (estante) {
+    supabaseQuery = supabaseQuery.ilike("estante", `%${estante}%`);
+  }
+
+  if (nivel) {
+    supabaseQuery = supabaseQuery.eq("nivel", nivel);
+  }
+
+  // Filtros de rango
+  if (precio_min !== undefined) {
+    supabaseQuery = supabaseQuery.gte("precio", precio_min);
+  }
+
+  if (precio_max !== undefined) {
+    supabaseQuery = supabaseQuery.lte("precio", precio_max);
+  }
+
+  if (stock_min !== undefined) {
+    supabaseQuery = supabaseQuery.gte("stock", stock_min);
+  }
+
+  // Limitar resultados
+  supabaseQuery = supabaseQuery.limit(limit);
+
+  const { data, error } = await supabaseQuery;
+
+  if (error) throw error;
+  return data || [];
+};

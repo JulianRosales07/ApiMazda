@@ -34,7 +34,16 @@ export const obtenerUsuario = async (req, res) => {
 // Crear un nuevo usuario
 export const crearUsuario = async (req, res) => {
   try {
-    const { nombre, email, password, rol } = req.body;
+    const { nombre, email, password, rol, rol_usuario_actual } = req.body;
+
+    // VALIDACIÓN DE ROL: Solo administradores pueden crear usuarios
+    if (rol_usuario_actual !== "administrador") {
+      return error(
+        res,
+        { message: "Acceso denegado. Solo administradores pueden crear usuarios" },
+        403
+      );
+    }
 
     // Validar campos requeridos
     if (!nombre || !email || !password) {
@@ -123,6 +132,16 @@ export const actualizarPassword = async (req, res) => {
 export const eliminarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
+    const { rol } = req.body;
+
+    // VALIDACIÓN DE ROL: Solo administradores pueden eliminar usuarios
+    if (rol !== "administrador") {
+      return error(
+        res,
+        { message: "Acceso denegado. Solo administradores pueden eliminar usuarios" },
+        403
+      );
+    }
 
     // Verificar si el usuario existe
     const usuarioExistente = await getUsuarioById(id);
