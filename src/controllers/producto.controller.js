@@ -42,6 +42,14 @@ export const crearRepuesto = async (req, res) => {
     const nuevo = await createRepuesto(req.body);
     success(res, nuevo, "Repuesto creado correctamente");
   } catch (err) {
+    // Error de clave duplicada (código de barras ya existe)
+    if (err.code === "23505") {
+      return error(
+        res,
+        { message: "El código de barras (CB) ya existe en el sistema" },
+        400
+      );
+    }
     error(res, err);
   }
 };

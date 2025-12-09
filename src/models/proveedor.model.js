@@ -38,7 +38,7 @@ export const getProveedorByCP = async (cp) => {
 
 // Crear un nuevo proveedor
 export const createProveedor = async (proveedor) => {
-  const { ci, cp, nombre_proveedor, costo, usuario_creacion } = proveedor;
+  const { ci, cp, nombre_proveedor, costo, saldo_a_favor, saldo_en_contra, usuario_creacion } = proveedor;
 
   const { data, error } = await supabase
     .from("proveedores")
@@ -48,6 +48,8 @@ export const createProveedor = async (proveedor) => {
         cp,
         nombre_proveedor,
         costo: costo || 0,
+        saldo_a_favor: saldo_a_favor || 0,
+        saldo_en_contra: saldo_en_contra || 0,
         usuario_creacion,
       },
     ])
@@ -60,16 +62,28 @@ export const createProveedor = async (proveedor) => {
 
 // Actualizar un proveedor
 export const updateProveedor = async (id, proveedor) => {
-  const { ci, cp, nombre_proveedor, costo } = proveedor;
+  const { ci, cp, nombre_proveedor, costo, saldo_a_favor, saldo_en_contra } = proveedor;
+
+  const updateData = {
+    ci,
+    cp,
+    nombre_proveedor,
+    costo,
+  };
+
+  // Solo incluir saldo_a_favor si está presente en el objeto
+  if (saldo_a_favor !== undefined) {
+    updateData.saldo_a_favor = saldo_a_favor;
+  }
+
+  // Solo incluir saldo_en_contra si está presente en el objeto
+  if (saldo_en_contra !== undefined) {
+    updateData.saldo_en_contra = saldo_en_contra;
+  }
 
   const { data, error } = await supabase
     .from("proveedores")
-    .update({
-      ci,
-      cp,
-      nombre_proveedor,
-      costo,
-    })
+    .update(updateData)
     .eq("id_proveedor", id)
     .select();
 

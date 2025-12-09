@@ -51,6 +51,14 @@ export const crearSalida = async (req, res) => {
     const nueva = await createSalida(req.body);
     success(res, nueva, "Salida creada correctamente");
   } catch (err) {
+    // Error de clave duplicada
+    if (err.code === "23505") {
+      return error(
+        res,
+        { message: "Ya existe una salida con este número de factura" },
+        400
+      );
+    }
     error(res, err);
   }
 };

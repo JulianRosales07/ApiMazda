@@ -53,6 +53,14 @@ export const crearProveedor = async (req, res) => {
     const nuevo = await createProveedor(req.body);
     success(res, nuevo, "Proveedor creado correctamente");
   } catch (err) {
+    // Error de clave duplicada
+    if (err.code === "23505") {
+      return error(
+        res,
+        { message: "El código de proveedor (CP) ya existe" },
+        400
+      );
+    }
     error(res, err);
   }
 };
@@ -76,8 +84,8 @@ export const actualizarProveedor = async (req, res) => {
       }
     }
 
-    await updateProveedor(id, req.body);
-    success(res, null, "Proveedor actualizado correctamente");
+    const proveedorActualizado = await updateProveedor(id, req.body);
+    success(res, proveedorActualizado[0], "Proveedor actualizado correctamente");
   } catch (err) {
     error(res, err);
   }

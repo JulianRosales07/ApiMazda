@@ -58,6 +58,14 @@ export const crearEntrada = async (req, res) => {
     const nueva = await createEntrada(req.body);
     success(res, nueva, "Entrada creada correctamente");
   } catch (err) {
+    // Error de clave duplicada
+    if (err.code === "23505") {
+      return error(
+        res,
+        { message: "Ya existe una entrada con este identificador" },
+        400
+      );
+    }
     error(res, err);
   }
 };
