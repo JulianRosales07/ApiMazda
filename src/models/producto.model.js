@@ -126,9 +126,16 @@ export const updateRepuesto = async (cb, repuesto) => {
 
 // Eliminar un producto (soft delete)
 export const deleteRepuesto = async (cb) => {
+  // Generar un sufijo único basado en timestamp para liberar CB y CI
+  const timestamp = Date.now();
+  
   const { data, error } = await supabase
     .from("repuestos")
-    .update({ activo: false })
+    .update({ 
+      activo: false,
+      cb: `${cb}_deleted_${timestamp}`,
+      ci: null
+    })
     .eq("cb", cb)
     .select();
   
