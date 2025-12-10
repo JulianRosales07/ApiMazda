@@ -5,6 +5,7 @@ import {
   updateRepuesto,
   deleteRepuesto,
   searchRepuestos,
+  getMaxCodes,
 } from "../models/producto.model.js";
 import { success, error } from "../utils/response.js";
 
@@ -67,6 +68,18 @@ export const eliminarRepuesto = async (req, res) => {
   try {
     await deleteRepuesto(req.params.cb);
     success(res, null, "Repuesto eliminado correctamente");
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+export const obtenerMaxCodes = async (req, res) => {
+  try {
+    const data = await getMaxCodes();
+    success(res, {
+      maxCI: data.max_ci,
+      maxCB: data.max_cb
+    }, "Operación exitosa");
   } catch (err) {
     error(res, err);
   }

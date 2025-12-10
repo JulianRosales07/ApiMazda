@@ -6,9 +6,40 @@ import {
   actualizarRepuesto,
   eliminarRepuesto,
   buscarRepuestos,
+  obtenerMaxCodes,
 } from "../controllers/producto.controller.js";
 
 const router = Router();
+
+/**
+ * @swagger
+ * /api/repuestos/max-codes:
+ *   get:
+ *     summary: Obtener los valores máximos de CI y CB (optimizado)
+ *     tags: [Repuestos]
+ *     responses:
+ *       200:
+ *         description: Valores máximos de CI y CB
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     maxCI:
+ *                       type: integer
+ *                       example: 109397
+ *                     maxCB:
+ *                       type: integer
+ *                       example: 1010364
+ */
+router.get("/max-codes", obtenerMaxCodes);
 
 /**
  * @swagger

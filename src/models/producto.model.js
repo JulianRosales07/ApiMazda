@@ -274,3 +274,35 @@ function applyFilters(supabaseQuery, searchParams) {
 
   return supabaseQuery;
 }
+
+// Obtener los valores máximos de CI y CB de forma optimizada
+export const getMaxCodes = async () => {
+  const { data, error } = await supabase.rpc('get_max_codes');
+  
+  if (error) {
+    // Si la función RPC no existe, hacer consulta directa
+    const { data: ciData, error: ciError } = await supabase
+      .from("repuestos")
+      .select("ci")
+      .not("ci", "is", null)
+      .order("ci", { ascending: false })
+      .limit(1);
+    
+    const { data: cbData, error: cbError } = await supabase
+      .from("repuestos")
+      .select("cb")
+      .not("cb", "is", null)
+      .order("cb", { ascending: false })
+      .limit(1);
+    
+    if (ciError || cbError) throw ciError || cbError;
+    
+    // Convertir a números y aplicar valores por defecto
+    const maxCI = ciData && ciData.length > 0 ? parseInt(ciData[0].ci) || 100000 : 100000;
+    const maxCB = cbData && cbData.length > 0 ? parseInt(cbData[0].cb) || 1000000 : 1000000;
+    
+    return { max_ci: maxCI, max_cb: maxCB };
+  }
+  
+  return data;
+};
