@@ -1,11 +1,11 @@
 import express from "express";
 import * as historialPreciosController from "../controllers/historialPrecios.controller.js";
-import { authenticateToken } from "../middleware/auth.middleware.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 // Todas las rutas requieren autenticación
-router.use(authenticateToken);
+router.use(authMiddleware);
 
 /**
  * @swagger
