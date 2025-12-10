@@ -9,6 +9,7 @@ import entradaRoutes from "./routes/entrada.routes.js";
 import proveedorRoutes from "./routes/proveedor.routes.js";
 import productoProveedorRoutes from "./routes/productoProveedor.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import historialPreciosRoutes from "./routes/historialPrecios.routes.js";
 
 const app = express();
 
@@ -62,6 +63,16 @@ app.get("/", (req, res) => {
     { group: "PRODUCTO-PROVEEDOR", method: "POST", path: "/api/producto-proveedor/principal", desc: "Establecer proveedor principal" },
     { group: "PRODUCTO-PROVEEDOR", method: "PUT", path: "/api/producto-proveedor/:id", desc: "Actualizar relación" },
     { group: "PRODUCTO-PROVEEDOR", method: "DELETE", path: "/api/producto-proveedor/:id", desc: "Desactivar relación" },
+    
+    { group: "HISTORIAL-PRECIOS", method: "GET", path: "/api/historial-precios", desc: "Obtener historial con filtros" },
+    { group: "HISTORIAL-PRECIOS", method: "GET", path: "/api/historial-precios/producto/:producto_cb", desc: "Historial por producto" },
+    { group: "HISTORIAL-PRECIOS", method: "GET", path: "/api/historial-precios/proveedor/:proveedor_id", desc: "Historial por proveedor" },
+    { group: "HISTORIAL-PRECIOS", method: "GET", path: "/api/historial-precios/producto/:producto_cb/proveedor/:proveedor_id", desc: "Historial producto-proveedor" },
+    { group: "HISTORIAL-PRECIOS", method: "GET", path: "/api/historial-precios/estadisticas/:producto_cb/:proveedor_id", desc: "Estadísticas de precios" },
+    { group: "HISTORIAL-PRECIOS", method: "GET", path: "/api/historial-precios/comparar/:producto_cb", desc: "Comparar proveedores" },
+    { group: "HISTORIAL-PRECIOS", method: "POST", path: "/api/historial-precios", desc: "Crear registro manual" },
+    { group: "HISTORIAL-PRECIOS", method: "PUT", path: "/api/historial-precios/:id", desc: "Actualizar registro" },
+    { group: "HISTORIAL-PRECIOS", method: "DELETE", path: "/api/historial-precios/:id", desc: "Eliminar registro" },
   ];
 
   const groupedRoutes = {};
@@ -235,5 +246,6 @@ app.use("/api/salidas", salidaRoutes);
 app.use("/api/entradas", entradaRoutes);
 app.use("/api/proveedores", proveedorRoutes);
 app.use("/api/producto-proveedor", productoProveedorRoutes);
+app.use("/api/historial-precios", historialPreciosRoutes);
 
 export default app;

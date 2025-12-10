@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial de Precios - Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-group label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2em;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #e0e0e0;
+      transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .badge-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .badge-info {
+      background: #17a2b8;
+      color: white;
+    }
+
+    .price-change {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .arrow-up {
+      color: #dc3545;
+      font-size: 1.2em;
+    }
+
+    .arrow-down {
+      color: #28a745;
+      font-size: 1.2em;
+    }
+
+    .chart-container {
+      margin: 30px 0;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px;
+      color: #999;
+    }
+
+    .empty-state svg {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📊 Historial de Precios</h1>
+      <p>Sistema de seguimiento de cambios de precios por proveedor</p>
+    </div>
+
+    <div class="content">
+      <!-- Filtros -->
+      <div class="filters">
+        <div class="filter-group">
+          <label>Producto (CB)</label>
+          <input type="text" id="productoCB" placeholder="Ej: 1000001">
+        </div>
+        <div class="filter-group">
+          <label>Proveedor</label>
+          <select id="proveedorId">
+            <option value="">Todos</option>
+            <option value="1">Proveedor ABC</option>
+            <option value="2">Proveedor XYZ</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Fecha Desde</label>
+          <input type="date" id="fechaDesde">
+        </div>
+        <div class="filter-group">
+          <label>Fecha Hasta</label>
+          <input type="date" id="fechaHasta">
+        </div>
+        <div class="filter-group" style="justify-content: flex-end;">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" onclick="buscarHistorial()">
+            🔍 Buscar
+          </button>
+        </div>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="stats-grid" id="statsGrid" style="display: none;">
+        <div class="stat-card">
+          <div class="stat-label">Precio Actual</div>
+          <div class="stat-value" id="precioActual">$0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Precio Mínimo</div>
+          <div class="stat-value" id="precioMinimo">$0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Precio Máximo</div>
+          <div class="stat-value" id="precioMaximo">$0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Precio Promedio</div>
+          <div class="stat-value" id="precioPromedio">$0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Cambios</div>
+          <div class="stat-value" id="totalCambios">0</div>
+        </div>
+      </div>
+
+      <!-- Tabla de Historial -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Producto</th>
+              <th>Proveedor</th>
+              <th>Precio Anterior</th>
+              <th>Precio Nuevo</th>
+              <th>Cambio</th>
+              <th>Motivo</th>
+              <th>Usuario</th>
+            </tr>
+          </thead>
+          <tbody id="historialBody">
+            <!-- Datos de ejemplo -->
+            <tr>
+              <td>10/12/2024 10:30</td>
+              <td>
+                <strong>Filtro de Aceite</strong><br>
+                <small style="color: #666;">CB: 1000001</small>
+              </td>
+              <td>
+                <strong>Proveedor ABC</strong><br>
+                <small style="color: #666;">CP: P001</small>
+              </td>
+              <td>$150.00</td>
+              <td><strong>$175.00</strong></td>
+              <td>
+                <div class="price-change">
+                  <span class="arrow-up">↑</span>
+                  <span class="badge badge-danger">+16.67%</span>
+                </div>
+              </td>
+              <td>Ajuste por inflación</td>
+              <td>admin</td>
+            </tr>
+            <tr>
+              <td>05/12/2024 14:15</td>
+              <td>
+                <strong>Filtro de Aceite</strong><br>
+                <small style="color: #666;">CB: 1000001</small>
+              </td>
+              <td>
+                <strong>Proveedor ABC</strong><br>
+                <small style="color: #666;">CP: P001</small>
+              </td>
+              <td>$160.00</td>
+              <td><strong>$150.00</strong></td>
+              <td>
+                <div class="price-change">
+                  <span class="arrow-down">↓</span>
+                  <span class="badge badge-success">-6.25%</span>
+                </div>
+              </td>
+              <td>Promoción especial</td>
+              <td>vendedor1</td>
+            </tr>
+            <tr>
+              <td>01/12/2024 09:00</td>
+              <td>
+                <strong>Filtro de Aceite</strong><br>
+                <small style="color: #666;">CB: 1000001</small>
+              </td>
+              <td>
+                <strong>Proveedor ABC</strong><br>
+                <small style="color: #666;">CP: P001</small>
+              </td>
+              <td>$145.00</td>
+              <td><strong>$160.00</strong></td>
+              <td>
+                <div class="price-change">
+                  <span class="arrow-up">↑</span>
+                  <span class="badge badge-danger">+10.34%</span>
+                </div>
+              </td>
+              <td>Actualización de costos</td>
+              <td>admin</td>
+            </tr>
+            <tr>
+              <td>25/11/2024 16:45</td>
+              <td>
+                <strong>Filtro de Aceite</strong><br>
+                <small style="color: #666;">CB: 1000001</small>
+              </td>
+              <td>
+                <strong>Proveedor ABC</strong><br>
+                <small style="color: #666;">CP: P001</small>
+              </td>
+              <td>-</td>
+              <td><strong>$145.00</strong></td>
+              <td>
+                <span class="badge badge-info">Precio inicial</span>
+              </td>
+              <td>Registro inicial</td>
+              <td>sistema</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Estado vacío (oculto por defecto) -->
+      <div class="empty-state" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+        </svg>
+        <h3>No hay registros</h3>
+        <p>No se encontraron cambios de precio con los filtros seleccionados</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Ejemplo de función para buscar historial
+    async function buscarHistorial() {
+      const productoCB = document.getElementById('productoCB').value;
+      const proveedorId = document.getElementById('proveedorId').value;
+      const fechaDesde = document.getElementById('fechaDesde').value;
+      const fechaHasta = document.getElementById('fechaHasta').value;
+
+      // Construir URL con parámetros
+      let url = '/api/historial-precios?';
+      if (productoCB) url += `producto_cb=${productoCB}&`;
+      if (proveedorId) url += `proveedor_id=${proveedorId}&`;
+      if (fechaDesde) url += `fecha_desde=${fechaDesde}&`;
+      if (fechaHasta) url += `fecha_hasta=${fechaHasta}&`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success) {
+          mostrarHistorial(data.data);
+          
+          // Si hay producto y proveedor específicos, mostrar estadísticas
+          if (productoCB && proveedorId) {
+            cargarEstadisticas(productoCB, proveedorId);
+          }
+        }
+      } catch (error) {
+        console.error('Error al buscar historial:', error);
+        alert('Error al buscar historial de precios');
+      }
+    }
+
+    function mostrarHistorial(historial) {
+      const tbody = document.getElementById('historialBody');
+      
+      if (historial.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No hay registros</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = historial.map(h => {
+        const fecha = new Date(h.fecha_cambio).toLocaleString('es-ES');
+        const cambio = h.porcentaje_cambio;
+        const esAumento = cambio > 0;
+        
+        return `
+          <tr>
+            <td>${fecha}</td>
+            <td>
+              <strong>${h.producto_nombre || 'N/A'}</strong><br>
+              <small style="color: #666;">CB: ${h.producto_cb}</small>
+            </td>
+            <td>
+              <strong>${h.proveedor_nombre || 'N/A'}</strong><br>
+              <small style="color: #666;">CP: ${h.proveedor_cp || 'N/A'}</small>
+            </td>
+            <td>$${h.precio_anterior?.toFixed(2) || '-'}</td>
+            <td><strong>$${h.precio_nuevo.toFixed(2)}</strong></td>
+            <td>
+              ${cambio ? `
+                <div class="price-change">
+                  <span class="${esAumento ? 'arrow-up' : 'arrow-down'}">${esAumento ? '↑' : '↓'}</span>
+                  <span class="badge ${esAumento ? 'badge-danger' : 'badge-success'}">
+                    ${esAumento ? '+' : ''}${cambio.toFixed(2)}%
+                  </span>
+                </div>
+              ` : '<span class="badge badge-info">Inicial</span>'}
+            </td>
+            <td>${h.motivo_cambio || '-'}</td>
+            <td>${h.usuario_modificacion || '-'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function cargarEstadisticas(productoCB, proveedorId) {
+      try {
+        const response = await fetch(`/api/historial-precios/estadisticas/${productoCB}/${proveedorId}`);
+        const data = await response.json();
+
+        if (data.success) {
+          const stats = data.data;
+          document.getElementById('precioActual').textContent = `$${stats.precio_actual?.toFixed(2) || '0.00'}`;
+          document.getElementById('precioMinimo').textContent = `$${stats.precio_minimo?.toFixed(2) || '0.00'}`;
+          document.getElementById('precioMaximo').textContent = `$${stats.precio_maximo?.toFixed(2) || '0.00'}`;
+          document.getElementById('precioPromedio').textContent = `$${stats.precio_promedio?.toFixed(2) || '0.00'}`;
+          document.getElementById('totalCambios').textContent = stats.total_cambios || 0;
+          
+          document.getElementById('statsGrid').style.display = 'grid';
+        }
+      } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+      }
+    }
+
+    // Establecer fecha de hoy por defecto
+    document.getElementById('fechaHasta').valueAsDate = new Date();
+    
+    // Establecer fecha de hace 30 días
+    const hace30Dias = new Date();
+    hace30Dias.setDate(hace30Dias.getDate() - 30);
+    document.getElementById('fechaDesde').valueAsDate = hace30Dias;
+  </script>
+</body>
+</html>
