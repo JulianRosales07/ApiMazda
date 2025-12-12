@@ -6,7 +6,7 @@ def safe_float(val):
     except ValueError:
         return 0.0
 
-filename = 'NUEVO SISTEMA (1)21.csv'
+filename = 'NUEVO SISTEMA22.csv'
 output_file = 'inserts_repuestos.sql'
 
 with open(filename, 'r', encoding='utf-8') as file, open(output_file, 'w', encoding='utf-8') as out:
