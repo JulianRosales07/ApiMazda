@@ -180,12 +180,36 @@ export const setProveedorPrincipal = async (producto_cb, proveedor_id) => {
   return data;
 };
 
-// Desactivar relación producto-proveedor
+// Desactivar relación producto-proveedor (soft delete)
 export const deleteProductoProveedor = async (id) => {
   const { data, error } = await supabase
     .from("producto_proveedor")
     .update({ activo: false })
     .eq("id_producto_proveedor", id)
+    .select();
+
+  if (error) throw error;
+  return data;
+};
+
+// Eliminar permanentemente relación producto-proveedor (hard delete)
+export const hardDeleteProductoProveedor = async (id) => {
+  const { data, error } = await supabase
+    .from("producto_proveedor")
+    .delete()
+    .eq("id_producto_proveedor", id)
+    .select();
+
+  if (error) throw error;
+  return data;
+};
+
+// Eliminar permanentemente todas las relaciones de un producto (hard delete)
+export const hardDeleteProductoProveedorByProducto = async (producto_cb) => {
+  const { data, error } = await supabase
+    .from("producto_proveedor")
+    .delete()
+    .eq("producto_cb", producto_cb)
     .select();
 
   if (error) throw error;

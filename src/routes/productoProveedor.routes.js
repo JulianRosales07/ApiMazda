@@ -9,6 +9,7 @@ import {
   actualizarProductoProveedor,
   establecerProveedorPrincipal,
   eliminarProductoProveedor,
+  eliminarRelacionesProducto,
 } from "../controllers/productoProveedor.controller.js";
 
 const router = Router();
@@ -208,5 +209,24 @@ router.put("/:id", actualizarProductoProveedor);
  *         description: Relación desactivada
  */
 router.delete("/:id", eliminarProductoProveedor);
+
+/**
+ * @swagger
+ * /api/producto-proveedor/producto/{producto_cb}/hard-delete:
+ *   delete:
+ *     summary: Eliminar permanentemente todas las relaciones de un producto
+ *     tags: [Producto-Proveedor]
+ *     parameters:
+ *       - in: path
+ *         name: producto_cb
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Código de barras del producto
+ *     responses:
+ *       200:
+ *         description: Relaciones eliminadas permanentemente
+ */
+router.delete("/producto/:producto_cb/hard-delete", eliminarRelacionesProducto);
 
 export default router;

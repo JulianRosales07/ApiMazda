@@ -8,6 +8,7 @@ import {
   updateProductoProveedor,
   setProveedorPrincipal,
   deleteProductoProveedor,
+  hardDeleteProductoProveedorByProducto,
   getProductoProveedorById,
 } from "../models/productoProveedor.model.js";
 import { success, error } from "../utils/response.js";
@@ -164,6 +165,17 @@ export const eliminarProductoProveedor = async (req, res) => {
 
     await deleteProductoProveedor(id);
     success(res, null, "Relación producto-proveedor desactivada correctamente");
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+// Eliminar permanentemente todas las relaciones de un producto
+export const eliminarRelacionesProducto = async (req, res) => {
+  try {
+    const { producto_cb } = req.params;
+    const deleted = await hardDeleteProductoProveedorByProducto(producto_cb);
+    success(res, deleted, `${deleted?.length || 0} relaciones eliminadas permanentemente`);
   } catch (err) {
     error(res, err);
   }
