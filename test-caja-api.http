@@ -1,0 +1,281 @@
+### ============================================
+### PRUEBAS API SISTEMA DE CAJA - MAZDA JAPON
+### ============================================
+### Usar con REST Client extension en VS Code
+### o importar en Postman/Insomnia
+
+@baseUrl = http://localhost:3000/api
+@usuario_id = 1
+
+### ============================================
+### 1. VERIFICAR SERVIDOR
+### ============================================
+
+GET {{baseUrl}}/usuarios
+Content-Type: application/json
+
+### ============================================
+### 2. CAJAS - Verificar si hay caja abierta
+### ============================================
+
+GET {{baseUrl}}/caja/cajas/usuario/{{usuario_id}}/abierta
+Content-Type: application/json
+
+### ============================================
+### 3. CAJAS - Abrir nueva caja
+### ============================================
+
+POST {{baseUrl}}/caja/cajas
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "jornada": "mañana",
+  "monto_inicial": 100000,
+  "notas_apertura": "Apertura de prueba"
+}
+
+### ============================================
+### 4. CAJAS - Obtener todas las cajas
+### ============================================
+
+GET {{baseUrl}}/caja/cajas
+Content-Type: application/json
+
+### ============================================
+### 5. CAJAS - Obtener caja específica (cambiar ID)
+### ============================================
+
+GET {{baseUrl}}/caja/cajas/1
+Content-Type: application/json
+
+### ============================================
+### 6. CATEGORIAS - Obtener categorías de gastos
+### ============================================
+
+GET {{baseUrl}}/caja/categorias
+Content-Type: application/json
+
+### ============================================
+### 7. VENTAS - Registrar nueva venta
+### ============================================
+
+POST {{baseUrl}}/caja/ventas
+Content-Type: application/json
+
+{
+  "caja_id": 1,
+  "factura": "F-001",
+  "descripcion": "Venta de filtro de aceite",
+  "venta_por": "ALMACEN",
+  "valor": 25000,
+  "metodo_pago": "EFECTIVO",
+  "observaciones": "Cliente frecuente",
+  "usuario_registro": 1
+}
+
+### ============================================
+### 8. VENTAS - Obtener todas las ventas
+### ============================================
+
+GET {{baseUrl}}/caja/ventas
+Content-Type: application/json
+
+### ============================================
+### 9. VENTAS - Filtrar ventas por caja
+### ============================================
+
+GET {{baseUrl}}/caja/ventas?caja_id=1
+Content-Type: application/json
+
+### ============================================
+### 10. GASTOS - Registrar nuevo gasto
+### ============================================
+
+POST {{baseUrl}}/caja/gastos
+Content-Type: application/json
+
+{
+  "caja_id": 1,
+  "descripcion": "Pago de luz",
+  "categoria_id": 1,
+  "subcategoria_id": 1,
+  "metodo_pago": "EFECTIVO",
+  "valor": 80000,
+  "usuario_registro": 1
+}
+
+### ============================================
+### 11. GASTOS - Obtener todos los gastos
+### ============================================
+
+GET {{baseUrl}}/caja/gastos
+Content-Type: application/json
+
+### ============================================
+### 12. GASTOS - Filtrar gastos por caja
+### ============================================
+
+GET {{baseUrl}}/caja/gastos?caja_id=1
+Content-Type: application/json
+
+### ============================================
+### 13. CAJAS - Calcular totales de caja
+### ============================================
+
+GET {{baseUrl}}/caja/cajas/1/totales
+Content-Type: application/json
+
+### ============================================
+### 14. REPORTES - Ventas por método de pago
+### ============================================
+
+GET {{baseUrl}}/caja/reportes/cajas/1/ventas-metodo
+Content-Type: application/json
+
+### ============================================
+### 15. REPORTES - Gastos por categoría
+### ============================================
+
+GET {{baseUrl}}/caja/reportes/cajas/1/gastos-categoria
+Content-Type: application/json
+
+### ============================================
+### 16. REPORTES - Reporte diario
+### ============================================
+
+GET {{baseUrl}}/caja/reportes/diario?fecha_inicio=2024-01-01&fecha_fin=2024-12-31
+Content-Type: application/json
+
+### ============================================
+### 17. REPORTES - Reporte mensual
+### ============================================
+
+GET {{baseUrl}}/caja/reportes/mensual?anio=2024&mes=12
+Content-Type: application/json
+
+### ============================================
+### 18. CAJAS - Cerrar caja
+### ============================================
+
+POST {{baseUrl}}/caja/cajas/1/cerrar
+Content-Type: application/json
+
+{
+  "monto_final": 145000,
+  "notas_cierre": "Cierre de prueba - todo correcto"
+}
+
+### ============================================
+### 19. VENTAS - Actualizar venta (cambiar ID)
+### ============================================
+
+PUT {{baseUrl}}/caja/ventas/1
+Content-Type: application/json
+
+{
+  "observaciones": "Actualizado - Cliente VIP"
+}
+
+### ============================================
+### 20. GASTOS - Actualizar gasto (cambiar ID)
+### ============================================
+
+PUT {{baseUrl}}/caja/gastos/1
+Content-Type: application/json
+
+{
+  "descripcion": "Pago de luz - Actualizado"
+}
+
+### ============================================
+### 21. VENTAS - Eliminar venta (cambiar ID)
+### ============================================
+
+DELETE {{baseUrl}}/caja/ventas/1
+Content-Type: application/json
+
+### ============================================
+### 22. GASTOS - Eliminar gasto (cambiar ID)
+### ============================================
+
+DELETE {{baseUrl}}/caja/gastos/1
+Content-Type: application/json
+
+### ============================================
+### FLUJO COMPLETO DE PRUEBA
+### ============================================
+
+### Paso 1: Verificar si hay caja abierta
+GET {{baseUrl}}/caja/cajas/usuario/1/abierta
+
+### Paso 2: Abrir caja si no hay ninguna abierta
+POST {{baseUrl}}/caja/cajas
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "jornada": "tarde",
+  "monto_inicial": 150000,
+  "notas_apertura": "Apertura jornada tarde"
+}
+
+### Paso 3: Registrar varias ventas
+POST {{baseUrl}}/caja/ventas
+Content-Type: application/json
+
+{
+  "caja_id": 1,
+  "factura": "F-002",
+  "descripcion": "Venta de pastillas de freno",
+  "venta_por": "ALMACEN",
+  "valor": 85000,
+  "metodo_pago": "TARJETA",
+  "usuario_registro": 1
+}
+
+###
+POST {{baseUrl}}/caja/ventas
+Content-Type: application/json
+
+{
+  "caja_id": 1,
+  "factura": "F-003",
+  "descripcion": "Venta de bujías",
+  "venta_por": "REDES",
+  "valor": 12000,
+  "metodo_pago": "NEQUI",
+  "usuario_registro": 1
+}
+
+### Paso 4: Registrar gastos
+POST {{baseUrl}}/caja/gastos
+Content-Type: application/json
+
+{
+  "caja_id": 1,
+  "descripcion": "Compra de papelería",
+  "categoria_id": 3,
+  "subcategoria_id": 8,
+  "metodo_pago": "EFECTIVO",
+  "valor": 15000,
+  "usuario_registro": 1
+}
+
+### Paso 5: Ver totales
+GET {{baseUrl}}/caja/cajas/1/totales
+
+### Paso 6: Ver resumen de ventas por método
+GET {{baseUrl}}/caja/reportes/cajas/1/ventas-metodo
+
+### Paso 7: Ver resumen de gastos por categoría
+GET {{baseUrl}}/caja/reportes/cajas/1/gastos-categoria
+
+### Paso 8: Cerrar caja
+POST {{baseUrl}}/caja/cajas/1/cerrar
+Content-Type: application/json
+
+{
+  "monto_final": 232000,
+  "notas_cierre": "Cierre normal - sin novedades"
+}

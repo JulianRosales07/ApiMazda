@@ -53,6 +53,34 @@ app.listen(PORT, () => {
     { group: "PRODUCTO-PROVEEDOR", method: "POST", path: "/api/producto-proveedor/principal" },
     { group: "PRODUCTO-PROVEEDOR", method: "PUT", path: "/api/producto-proveedor/:id" },
     { group: "PRODUCTO-PROVEEDOR", method: "DELETE", path: "/api/producto-proveedor/:id" },
+    
+    { group: "CAJA", method: "GET", path: "/api/caja/cajas" },
+    { group: "CAJA", method: "GET", path: "/api/caja/cajas/:id" },
+    { group: "CAJA", method: "GET", path: "/api/caja/cajas/usuario/:usuario_id/abierta" },
+    { group: "CAJA", method: "GET", path: "/api/caja/cajas/:id/totales" },
+    { group: "CAJA", method: "POST", path: "/api/caja/cajas" },
+    { group: "CAJA", method: "POST", path: "/api/caja/cajas/:id/cerrar" },
+    { group: "CAJA", method: "PUT", path: "/api/caja/cajas/:id" },
+    
+    { group: "VENTAS", method: "GET", path: "/api/caja/ventas" },
+    { group: "VENTAS", method: "GET", path: "/api/caja/ventas/:id" },
+    { group: "VENTAS", method: "POST", path: "/api/caja/ventas" },
+    { group: "VENTAS", method: "PUT", path: "/api/caja/ventas/:id" },
+    { group: "VENTAS", method: "DELETE", path: "/api/caja/ventas/:id" },
+    
+    { group: "GASTOS", method: "GET", path: "/api/caja/gastos" },
+    { group: "GASTOS", method: "GET", path: "/api/caja/gastos/:id" },
+    { group: "GASTOS", method: "POST", path: "/api/caja/gastos" },
+    { group: "GASTOS", method: "PUT", path: "/api/caja/gastos/:id" },
+    { group: "GASTOS", method: "DELETE", path: "/api/caja/gastos/:id" },
+    
+    { group: "CATEGORIAS", method: "GET", path: "/api/caja/categorias" },
+    { group: "CATEGORIAS", method: "GET", path: "/api/caja/categorias/:categoria_id/subcategorias" },
+    
+    { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/diario" },
+    { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/mensual" },
+    { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/cajas/:caja_id/ventas-metodo" },
+    { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/cajas/:caja_id/gastos-categoria" },
   ];
   
   // Agrupar rutas

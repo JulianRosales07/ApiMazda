@@ -10,6 +10,7 @@ import proveedorRoutes from "./routes/proveedor.routes.js";
 import productoProveedorRoutes from "./routes/productoProveedor.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import historialPreciosRoutes from "./routes/historialPrecios.routes.js";
+import cajaRoutes from "./routes/caja.routes.js";
 
 const app = express();
 
@@ -73,6 +74,34 @@ app.get("/", (req, res) => {
     { group: "HISTORIAL-PRECIOS", method: "POST", path: "/api/historial-precios", desc: "Crear registro manual" },
     { group: "HISTORIAL-PRECIOS", method: "PUT", path: "/api/historial-precios/:id", desc: "Actualizar registro" },
     { group: "HISTORIAL-PRECIOS", method: "DELETE", path: "/api/historial-precios/:id", desc: "Eliminar registro" },
+    
+    { group: "CAJA", method: "GET", path: "/api/caja/cajas", desc: "Obtener todas las cajas" },
+    { group: "CAJA", method: "GET", path: "/api/caja/cajas/:id", desc: "Obtener una caja por ID" },
+    { group: "CAJA", method: "GET", path: "/api/caja/cajas/usuario/:usuario_id/abierta", desc: "Obtener caja abierta de usuario" },
+    { group: "CAJA", method: "GET", path: "/api/caja/cajas/:id/totales", desc: "Calcular totales de caja" },
+    { group: "CAJA", method: "POST", path: "/api/caja/cajas", desc: "Abrir nueva caja" },
+    { group: "CAJA", method: "POST", path: "/api/caja/cajas/:id/cerrar", desc: "Cerrar caja" },
+    { group: "CAJA", method: "PUT", path: "/api/caja/cajas/:id", desc: "Actualizar caja" },
+    
+    { group: "VENTAS", method: "GET", path: "/api/caja/ventas", desc: "Obtener todas las ventas" },
+    { group: "VENTAS", method: "GET", path: "/api/caja/ventas/:id", desc: "Obtener una venta por ID" },
+    { group: "VENTAS", method: "POST", path: "/api/caja/ventas", desc: "Registrar nueva venta" },
+    { group: "VENTAS", method: "PUT", path: "/api/caja/ventas/:id", desc: "Actualizar venta" },
+    { group: "VENTAS", method: "DELETE", path: "/api/caja/ventas/:id", desc: "Eliminar venta" },
+    
+    { group: "GASTOS", method: "GET", path: "/api/caja/gastos", desc: "Obtener todos los gastos" },
+    { group: "GASTOS", method: "GET", path: "/api/caja/gastos/:id", desc: "Obtener un gasto por ID" },
+    { group: "GASTOS", method: "POST", path: "/api/caja/gastos", desc: "Registrar nuevo gasto" },
+    { group: "GASTOS", method: "PUT", path: "/api/caja/gastos/:id", desc: "Actualizar gasto" },
+    { group: "GASTOS", method: "DELETE", path: "/api/caja/gastos/:id", desc: "Eliminar gasto" },
+    
+    { group: "CATEGORIAS", method: "GET", path: "/api/caja/categorias", desc: "Obtener categorías de gastos" },
+    { group: "CATEGORIAS", method: "GET", path: "/api/caja/categorias/:categoria_id/subcategorias", desc: "Obtener subcategorías" },
+    
+    { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/diario", desc: "Reporte diario de cajas" },
+    { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/mensual", desc: "Reporte mensual de cajas" },
+    { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/cajas/:caja_id/ventas-metodo", desc: "Ventas por método de pago" },
+    { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/cajas/:caja_id/gastos-categoria", desc: "Gastos por categoría" },
   ];
 
   const groupedRoutes = {};
@@ -247,5 +276,6 @@ app.use("/api/entradas", entradaRoutes);
 app.use("/api/proveedores", proveedorRoutes);
 app.use("/api/producto-proveedor", productoProveedorRoutes);
 app.use("/api/historial-precios", historialPreciosRoutes);
+app.use("/api/caja", cajaRoutes);
 
 export default app;
