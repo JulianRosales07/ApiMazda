@@ -23,6 +23,13 @@ import {
   obtenerReporteMensualController,
   obtenerResumenVentasPorMetodo,
   obtenerResumenGastosPorCategoria,
+  obtenerSaldoCajaFuerte,
+  obtenerMovimientosCajaFuerte,
+  obtenerMovimientoCajaFuerte,
+  crearMovimientoCajaFuerte,
+  actualizarMovimientoCajaFuerte,
+  eliminarMovimientoCajaFuerte,
+  obtenerHistorialSaldosCajaFuerte,
 } from "../controllers/caja.controller.js";
 
 const router = Router();
@@ -519,5 +526,163 @@ router.get("/reportes/cajas/:caja_id/ventas-metodo", obtenerResumenVentasPorMeto
  *         description: Resumen de gastos
  */
 router.get("/reportes/cajas/:caja_id/gastos-categoria", obtenerResumenGastosPorCategoria);
+
+// ============================================
+// RUTAS DE CAJA FUERTE
+// ============================================
+
+/**
+ * @swagger
+ * /api/caja/caja-fuerte/saldo:
+ *   get:
+ *     summary: Obtener saldo actual de caja fuerte
+ *     tags: [Caja Fuerte]
+ *     responses:
+ *       200:
+ *         description: Saldo actual
+ */
+router.get("/caja-fuerte/saldo", obtenerSaldoCajaFuerte);
+
+/**
+ * @swagger
+ * /api/caja/caja-fuerte/movimientos:
+ *   get:
+ *     summary: Obtener todos los movimientos de caja fuerte
+ *     tags: [Caja Fuerte]
+ *     parameters:
+ *       - in: query
+ *         name: tipo_movimiento
+ *         schema:
+ *           type: string
+ *           enum: [DEPOSITO, RETIRO]
+ *       - in: query
+ *         name: fecha_inicio
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: fecha_fin
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Lista de movimientos
+ */
+router.get("/caja-fuerte/movimientos", obtenerMovimientosCajaFuerte);
+
+/**
+ * @swagger
+ * /api/caja/caja-fuerte/movimientos/{id}:
+ *   get:
+ *     summary: Obtener movimiento por ID
+ *     tags: [Caja Fuerte]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Movimiento encontrado
+ */
+router.get("/caja-fuerte/movimientos/:id", obtenerMovimientoCajaFuerte);
+
+/**
+ * @swagger
+ * /api/caja/caja-fuerte/historial:
+ *   get:
+ *     summary: Obtener historial de saldos
+ *     tags: [Caja Fuerte]
+ *     parameters:
+ *       - in: query
+ *         name: fecha_inicio
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: fecha_fin
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Historial de saldos
+ */
+router.get("/caja-fuerte/historial", obtenerHistorialSaldosCajaFuerte);
+
+/**
+ * @swagger
+ * /api/caja/caja-fuerte/movimientos:
+ *   post:
+ *     summary: Registrar movimiento en caja fuerte
+ *     tags: [Caja Fuerte]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - tipo_movimiento
+ *               - monto
+ *               - descripcion
+ *               - usuario_registro
+ *             properties:
+ *               tipo_movimiento:
+ *                 type: string
+ *                 enum: [DEPOSITO, RETIRO]
+ *               monto:
+ *                 type: number
+ *               descripcion:
+ *                 type: string
+ *               usuario_registro:
+ *                 type: integer
+ *               caja_id:
+ *                 type: integer
+ *               observaciones:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Movimiento registrado
+ */
+router.post("/caja-fuerte/movimientos", crearMovimientoCajaFuerte);
+
+/**
+ * @swagger
+ * /api/caja/caja-fuerte/movimientos/{id}:
+ *   put:
+ *     summary: Actualizar movimiento
+ *     tags: [Caja Fuerte]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Movimiento actualizado
+ */
+router.put("/caja-fuerte/movimientos/:id", actualizarMovimientoCajaFuerte);
+
+/**
+ * @swagger
+ * /api/caja/caja-fuerte/movimientos/{id}:
+ *   delete:
+ *     summary: Eliminar movimiento
+ *     tags: [Caja Fuerte]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Movimiento eliminado
+ */
+router.delete("/caja-fuerte/movimientos/:id", eliminarMovimientoCajaFuerte);
 
 export default router;

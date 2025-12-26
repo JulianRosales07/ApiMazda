@@ -22,6 +22,13 @@ import {
   getReporteMensual,
   getVentasPorMetodoPago,
   getGastosPorCategoria,
+  getSaldoCajaFuerte,
+  getAllMovimientosCajaFuerte,
+  getMovimientoCajaFuerteById,
+  registrarMovimientoCajaFuerte,
+  updateMovimientoCajaFuerte,
+  deleteMovimientoCajaFuerte,
+  getHistorialSaldos,
 } from "../models/caja.model.js";
 import { success, error } from "../utils/response.js";
 
@@ -301,6 +308,81 @@ export const obtenerResumenVentasPorMetodo = async (req, res) => {
 export const obtenerResumenGastosPorCategoria = async (req, res) => {
   try {
     const data = await getGastosPorCategoria(req.params.caja_id);
+    success(res, data);
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+// ============================================
+// CONTROLADORES DE CAJA FUERTE
+// ============================================
+
+export const obtenerSaldoCajaFuerte = async (req, res) => {
+  try {
+    const saldo = await getSaldoCajaFuerte();
+    success(res, { saldo });
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+export const obtenerMovimientosCajaFuerte = async (req, res) => {
+  try {
+    const filters = {
+      tipo_movimiento: req.query.tipo_movimiento,
+      fecha_inicio: req.query.fecha_inicio,
+      fecha_fin: req.query.fecha_fin,
+      usuario_registro: req.query.usuario_registro,
+    };
+    const data = await getAllMovimientosCajaFuerte(filters);
+    success(res, data);
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+export const obtenerMovimientoCajaFuerte = async (req, res) => {
+  try {
+    const data = await getMovimientoCajaFuerteById(req.params.id);
+    if (!data) return error(res, { message: "Movimiento no encontrado" }, 404);
+    success(res, data);
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+export const crearMovimientoCajaFuerte = async (req, res) => {
+  try {
+    const resultado = await registrarMovimientoCajaFuerte(req.body);
+    success(res, resultado, "Movimiento registrado correctamente");
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+export const actualizarMovimientoCajaFuerte = async (req, res) => {
+  try {
+    const data = await updateMovimientoCajaFuerte(req.params.id, req.body);
+    success(res, data, "Movimiento actualizado correctamente");
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+export const eliminarMovimientoCajaFuerte = async (req, res) => {
+  try {
+    await deleteMovimientoCajaFuerte(req.params.id);
+    success(res, null, "Movimiento eliminado correctamente");
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+export const obtenerHistorialSaldosCajaFuerte = async (req, res) => {
+  try {
+    const { fecha_inicio, fecha_fin } = req.query;
+    const data = await getHistorialSaldos(fecha_inicio, fecha_fin);
     success(res, data);
   } catch (err) {
     error(res, err);

@@ -38,6 +38,7 @@ const options = {
       { name: "Gastos", description: "Registro de gastos en caja" },
       { name: "Categorías", description: "Categorías y subcategorías de gastos" },
       { name: "Reportes Caja", description: "Reportes y estadísticas de caja" },
+      { name: "Caja Fuerte", description: "Gestión de caja fuerte (depósitos y retiros)" },
     ],
     components: {
       schemas: {
@@ -172,6 +173,73 @@ const options = {
             activo: { type: "boolean" },
           },
         },
+        MovimientoCajaFuerte: {
+          type: "object",
+          required: ["tipo_movimiento", "monto", "descripcion", "usuario_registro"],
+          properties: {
+            id_movimiento: { 
+              type: "integer",
+              description: "ID único del movimiento",
+              readOnly: true
+            },
+            tipo_movimiento: { 
+              type: "string", 
+              enum: ["DEPOSITO", "RETIRO"],
+              description: "Tipo de movimiento en caja fuerte"
+            },
+            monto: { 
+              type: "number",
+              minimum: 0.01,
+              description: "Monto del movimiento (debe ser positivo)"
+            },
+            saldo_anterior: { 
+              type: "number",
+              description: "Saldo antes del movimiento",
+              readOnly: true
+            },
+            saldo_nuevo: { 
+              type: "number",
+              description: "Saldo después del movimiento",
+              readOnly: true
+            },
+            fecha: { 
+              type: "string", 
+              format: "date-time",
+              description: "Fecha y hora del movimiento"
+            },
+            descripcion: { 
+              type: "string",
+              description: "Descripción del movimiento"
+            },
+            caja_id: { 
+              type: "integer", 
+              nullable: true,
+              description: "ID de la caja diaria relacionada (opcional)"
+            },
+            usuario_registro: { 
+              type: "integer",
+              description: "ID del usuario que registra el movimiento"
+            },
+            observaciones: { 
+              type: "string", 
+              nullable: true,
+              description: "Observaciones adicionales"
+            },
+            activo: { 
+              type: "boolean",
+              description: "Estado del registro"
+            },
+          },
+        },
+        SaldoCajaFuerte: {
+          type: "object",
+          properties: {
+            saldo: {
+              type: "number",
+              description: "Saldo actual en caja fuerte"
+            }
+          }
+        },
         Error: {
           type: "object",
           properties: {
@@ -188,7 +256,18 @@ const options = {
           },
         },
       },
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Ingrese el token JWT"
+        }
+      }
     },
+    security: [{
+      bearerAuth: []
+    }]
   },
   apis: ["./src/routes/*.js"],
 };
