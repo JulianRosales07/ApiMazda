@@ -1,14 +1,57 @@
-# ✅ Resumen - Implementación Caja Fuerte
+# ⚠️ Resumen - Implementación Caja Fuerte (ERROR 500 - FIX DISPONIBLE)
 
-## 🎯 Implementación Completada
+## 🔴 ESTADO ACTUAL: ERROR 500
 
-La funcionalidad de **Caja Fuerte** ha sido completamente implementada e integrada al sistema.
+```
+Error: Could not find the function public.registrar_movimiento_caja_fuerte(p_monto) in the schema cache
+Status: 500
+```
+
+**Causa:** Las funciones PostgreSQL no están creadas en Supabase.
+
+**Solución:** Ejecutar `FIX-COMPLETO-CAJA-FUERTE.sql` en Supabase SQL Editor.
+
+---
+
+## 🚨 ACCIÓN REQUERIDA
+
+### ⚡ Para Resolver el Error:
+
+1. **Abrir Supabase SQL Editor**
+   - https://supabase.com/dashboard → Tu proyecto → SQL Editor
+
+2. **Ejecutar Script de Fix**
+   - Abrir archivo: `FIX-COMPLETO-CAJA-FUERTE.sql`
+   - Copiar TODO el contenido
+   - Pegar en SQL Editor
+   - Click en **RUN**
+
+3. **Verificar Éxito**
+   - Deberías ver: ✅ PASO 1, ✅ PASO 2, etc.
+   - Las pruebas deberían funcionar
+   - Verás un depósito de prueba de 50,000
+
+4. **Probar desde Frontend**
+   - El error 500 debería desaparecer
+
+### 📄 Archivos de Ayuda
+
+- **`FIX-COMPLETO-CAJA-FUERTE.sql`** ← **EJECUTAR ESTE PRIMERO** (solución completa)
+- **`COMO-EJECUTAR-FIX.md`** ← Guía visual paso a paso
+- **`PASOS-RAPIDOS-FIX.md`** ← Solución rápida en 3 pasos
+- **`SOLUCION-ERROR-500.md`** ← Troubleshooting detallado
+
+---
+
+## 🎯 Implementación Completada (Backend)
+
+La funcionalidad de **Caja Fuerte** ha sido completamente implementada en el backend. Solo falta ejecutar el script SQL en Supabase.
 
 ---
 
 ## 📁 Archivos Modificados/Creados
 
-### 1. Base de Datos
+### 1. Base de Datos (⚠️ REQUIERE EJECUCIÓN EN SUPABASE)
 **Archivo:** `schema-caja.sql`
 
 ✅ **Tabla `caja_fuerte`:**
@@ -26,7 +69,7 @@ La funcionalidad de **Caja Fuerte** ha sido completamente implementada e integra
 - activo
 ```
 
-✅ **Funciones PostgreSQL:**
+⚠️ **Funciones PostgreSQL (NECESITAN SER CREADAS):**
 - `obtener_saldo_caja_fuerte()` - Obtiene saldo actual
 - `registrar_movimiento_caja_fuerte()` - Registra depósito/retiro con validaciones automáticas
 
@@ -35,9 +78,9 @@ La funcionalidad de **Caja Fuerte** ha sido completamente implementada e integra
 - Validación de saldo antes de retiros
 - Triggers para actualización de fechas
 - Índices para rendimiento
-- RLS (solo administradores)
+- RLS (políticas permisivas para desarrollo)
 
-### 2. Backend - Modelo
+### 2. Backend - Modelo ✅
 **Archivo:** `src/models/caja.model.js`
 
 ✅ **7 funciones agregadas:**
@@ -49,19 +92,19 @@ La funcionalidad de **Caja Fuerte** ha sido completamente implementada e integra
 - `deleteMovimientoCajaFuerte()` - Eliminar (soft)
 - `getHistorialSaldos()` - Historial completo
 
-### 3. Backend - Controlador
+### 3. Backend - Controlador ✅
 **Archivo:** `src/controllers/caja.controller.js`
 
 ✅ **7 controladores agregados:**
 - `obtenerSaldoCajaFuerte`
 - `obtenerMovimientosCajaFuerte`
 - `obtenerMovimientoCajaFuerte`
-- `crearMovimientoCajaFuerte`
+- `crearMovimientoCajaFuerte` ← **Actualmente con error 500**
 - `actualizarMovimientoCajaFuerte`
 - `eliminarMovimientoCajaFuerte`
 - `obtenerHistorialSaldosCajaFuerte`
 
-### 4. Backend - Rutas
+### 4. Backend - Rutas ✅
 **Archivo:** `src/routes/caja.routes.js`
 
 ✅ **7 endpoints REST agregados:**
@@ -70,12 +113,12 @@ GET    /api/caja/caja-fuerte/saldo
 GET    /api/caja/caja-fuerte/movimientos
 GET    /api/caja/caja-fuerte/movimientos/:id
 GET    /api/caja/caja-fuerte/historial
-POST   /api/caja/caja-fuerte/movimientos
+POST   /api/caja/caja-fuerte/movimientos ← ⚠️ Error 500
 PUT    /api/caja/caja-fuerte/movimientos/:id
 DELETE /api/caja/caja-fuerte/movimientos/:id
 ```
 
-### 5. Documentación Swagger
+### 5. Documentación Swagger ✅
 **Archivo:** `src/config/swagger.js`
 
 ✅ **Agregado:**
@@ -84,20 +127,24 @@ DELETE /api/caja/caja-fuerte/movimientos/:id
 - Schema `SaldoCajaFuerte`
 - Documentación completa en rutas
 
-### 6. Documentación
+### 6. Documentación ✅
 **Archivos creados:**
 - `CAJA-FUERTE-API.md` - Documentación completa para frontend
+- `FIX-COMPLETO-CAJA-FUERTE.sql` - **Script de solución completo**
+- `COMO-EJECUTAR-FIX.md` - Guía visual paso a paso
+- `PASOS-RAPIDOS-FIX.md` - Solución rápida
+- `SOLUCION-ERROR-500.md` - Troubleshooting
 - `RESUMEN-CAJA-FUERTE.md` - Este archivo
 
 ---
 
-## 🚀 Cómo Usar
+## 🚀 Cómo Usar (Después del Fix)
 
-### 1. Ejecutar Schema en Base de Datos
+### 1. Ejecutar Fix en Supabase
 
 ```sql
 -- En Supabase SQL Editor, ejecutar:
--- schema-caja.sql (completo)
+-- FIX-COMPLETO-CAJA-FUERTE.sql (completo)
 ```
 
 ### 2. Verificar en Swagger
@@ -115,7 +162,7 @@ Buscar la sección **"Caja Fuerte"** en Swagger UI
 curl https://apimazda.onrender.com/api/caja/caja-fuerte/saldo
 ```
 
-#### Registrar Depósito
+#### Registrar Depósito (Después del fix)
 ```bash
 curl -X POST https://apimazda.onrender.com/api/caja/caja-fuerte/movimientos \
   -H "Content-Type: application/json" \
@@ -128,7 +175,7 @@ curl -X POST https://apimazda.onrender.com/api/caja/caja-fuerte/movimientos \
   }'
 ```
 
-#### Registrar Retiro
+#### Registrar Retiro (Después del fix)
 ```bash
 curl -X POST https://apimazda.onrender.com/api/caja/caja-fuerte/movimientos \
   -H "Content-Type: application/json" \
@@ -142,7 +189,7 @@ curl -X POST https://apimazda.onrender.com/api/caja/caja-fuerte/movimientos \
 
 ---
 
-## 📊 Funcionalidades
+## 📊 Funcionalidades (Después del Fix)
 
 ### ✅ Depósitos
 - Guardar dinero en caja fuerte
@@ -160,13 +207,13 @@ curl -X POST https://apimazda.onrender.com/api/caja/caja-fuerte/movimientos \
 - Filtros por tipo, fecha, usuario
 
 ### ✅ Seguridad
-- Solo administradores pueden acceder
+- Políticas RLS permisivas (desarrollo)
 - Todos los movimientos registrados con usuario y fecha
 - Soft delete (no se eliminan físicamente)
 
 ---
 
-## 🔄 Flujo de Trabajo Típico
+## 🔄 Flujo de Trabajo Típico (Después del Fix)
 
 ### Escenario 1: Cierre de Caja Diaria
 
@@ -220,7 +267,7 @@ POST /api/caja/caja-fuerte/movimientos
 
 ---
 
-## 🎨 Ejemplo Frontend React
+## 🎨 Ejemplo Frontend React (Después del Fix)
 
 ```jsx
 import { useState, useEffect } from 'react';
@@ -279,19 +326,20 @@ function CajaFuerte() {
 ## 📈 Estadísticas de Implementación
 
 - **Tabla nueva:** 1 (caja_fuerte)
-- **Funciones PostgreSQL:** 2
-- **Funciones JavaScript:** 7
-- **Controladores:** 7
-- **Endpoints REST:** 7
+- **Funciones PostgreSQL:** 2 (⚠️ necesitan ser creadas)
+- **Funciones JavaScript:** 7 ✅
+- **Controladores:** 7 ✅
+- **Endpoints REST:** 7 ✅
 - **Documentación Swagger:** ✅ Completa
-- **Documentación Markdown:** 2 archivos
+- **Documentación Markdown:** 6 archivos ✅
+- **Scripts de Fix:** 4 archivos ✅
 
 ---
 
 ## ✅ Checklist de Verificación
 
 - [x] Tabla creada en base de datos
-- [x] Funciones PostgreSQL implementadas
+- [ ] **Funciones PostgreSQL implementadas** ← ⚠️ EJECUTAR FIX
 - [x] Triggers configurados
 - [x] Índices creados
 - [x] RLS habilitado
@@ -302,24 +350,40 @@ function CajaFuerte() {
 - [x] Documentación Markdown
 - [x] Ejemplos de uso
 - [x] Validaciones implementadas
+- [x] Scripts de fix creados
 
 ---
 
 ## 🎯 Estado Final
 
-**✅ IMPLEMENTACIÓN COMPLETA**
+**⚠️ IMPLEMENTACIÓN COMPLETA - REQUIERE EJECUTAR FIX SQL**
 
-La Caja Fuerte está 100% funcional e integrada con:
-- Sistema de cajas diarias
-- Sistema de usuarios
-- Documentación Swagger
-- Validaciones de seguridad
-- Control de acceso (solo administradores)
+La Caja Fuerte está 100% implementada en el backend, pero necesita que ejecutes el script SQL en Supabase:
 
-**Listo para usar en producción! 🚀**
+1. ✅ Sistema de cajas diarias integrado
+2. ✅ Sistema de usuarios integrado
+3. ✅ Documentación Swagger completa
+4. ✅ Validaciones de seguridad
+5. ⚠️ **Funciones PostgreSQL pendientes de crear en Supabase**
+
+**Próximo paso:** Ejecutar `FIX-COMPLETO-CAJA-FUERTE.sql` en Supabase SQL Editor.
 
 ---
 
-**Fecha:** Diciembre 2024  
-**Versión:** 1.0  
+## 🔴 Checklist de Resolución del Error
+
+- [ ] Abrir Supabase Dashboard
+- [ ] Ir a SQL Editor
+- [ ] Copiar contenido de `FIX-COMPLETO-CAJA-FUERTE.sql`
+- [ ] Pegar en SQL Editor
+- [ ] Ejecutar con RUN
+- [ ] Verificar mensajes de éxito
+- [ ] Probar desde frontend
+- [ ] Confirmar que no hay error 500
+
+---
+
+**Fecha:** Diciembre 26, 2024  
+**Versión:** 1.1.0 (Fix en progreso)  
+**Estado:** ⚠️ Requiere ejecutar script SQL en Supabase  
 **Desarrollador:** Julian Rosales
