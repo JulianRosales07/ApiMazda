@@ -81,6 +81,14 @@ app.listen(PORT, () => {
     { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/mensual" },
     { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/cajas/:caja_id/ventas-metodo" },
     { group: "REPORTES-CAJA", method: "GET", path: "/api/caja/reportes/cajas/:caja_id/gastos-categoria" },
+    
+    { group: "CAJA-FUERTE", method: "GET", path: "/api/caja/caja-fuerte/saldo" },
+    { group: "CAJA-FUERTE", method: "GET", path: "/api/caja/caja-fuerte/movimientos" },
+    { group: "CAJA-FUERTE", method: "GET", path: "/api/caja/caja-fuerte/movimientos/:id" },
+    { group: "CAJA-FUERTE", method: "GET", path: "/api/caja/caja-fuerte/historial" },
+    { group: "CAJA-FUERTE", method: "POST", path: "/api/caja/caja-fuerte/movimientos" },
+    { group: "CAJA-FUERTE", method: "PUT", path: "/api/caja/caja-fuerte/movimientos/:id" },
+    { group: "CAJA-FUERTE", method: "DELETE", path: "/api/caja/caja-fuerte/movimientos/:id" },
   ];
   
   // Agrupar rutas
