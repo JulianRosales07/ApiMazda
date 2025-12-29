@@ -8,10 +8,7 @@ import { supabase } from "../config/db.js";
 export const getAllCajas = async (filters = {}) => {
   let query = supabase
     .from("cajas")
-    .select(`
-      *,
-      usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email)
-    `)
+    .select("*")
     .eq("activo", true)
     .order("fecha_apertura", { ascending: false });
 
@@ -34,18 +31,15 @@ export const getAllCajas = async (filters = {}) => {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data;
+  return data || [];
 };
 
 // Obtener caja por ID
 export const getCajaById = async (id) => {
   const { data, error } = await supabase
     .from("cajas")
-    .select(`
-      *,
-      usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email)
-    `)
-    .eq("id_caja", id)
+    .select("*")
+    .eq("id_caja", parseInt(id))
     .single();
 
   if (error) throw error;
@@ -93,16 +87,68 @@ export const createCaja = async (cajaData) => {
   return data;
 };
 
-// Cerrar caja
+// Cerrar caja (sin usar función RPC)
 export const cerrarCaja = async (id_caja, monto_final, notas_cierre) => {
-  const { data, error } = await supabase.rpc("cerrar_caja", {
-    p_caja_id: id_caja,
-    p_monto_final: monto_final,
-    p_notas_cierre: notas_cierre,
-  });
+  // 1. Obtener la caja
+  const { data: caja, error: cajaError } = await supabase
+    .from("cajas")
+    .select("*")
+    .eq("id_caja", parseInt(id_caja))
+    .eq("estado", "abierta")
+    .single();
 
-  if (error) throw error;
-  return data;
+  if (cajaError || !caja) {
+    throw new Error("Caja no encontrada o ya está cerrada");
+  }
+
+  // 2. Calcular totales de ventas
+  const { data: ventas } = await supabase
+    .from("ventas")
+    .select("valor")
+    .eq("caja_id", parseInt(id_caja))
+    .eq("activo", true);
+
+  const total_ventas = ventas?.reduce((sum, v) => sum + parseFloat(v.valor), 0) || 0;
+
+  // 3. Calcular totales de gastos
+  const { data: gastos } = await supabase
+    .from("gastos")
+    .select("valor")
+    .eq("caja_id", parseInt(id_caja))
+    .eq("activo", true);
+
+  const total_gastos = gastos?.reduce((sum, g) => sum + parseFloat(g.valor), 0) || 0;
+
+  // 4. Calcular diferencia
+  const monto_esperado = parseFloat(caja.monto_inicial) + total_ventas - total_gastos;
+  const diferencia = parseFloat(monto_final) - monto_esperado;
+
+  // 5. Actualizar la caja
+  const { data: cajaActualizada, error: updateError } = await supabase
+    .from("cajas")
+    .update({
+      fecha_cierre: new Date().toISOString(),
+      monto_final: parseFloat(monto_final),
+      total_ventas,
+      total_gastos,
+      diferencia,
+      notas_cierre: notas_cierre || null,
+      estado: "cerrada",
+      fecha_actualizacion: new Date().toISOString(),
+    })
+    .eq("id_caja", parseInt(id_caja))
+    .select()
+    .single();
+
+  if (updateError) {
+    throw updateError;
+  }
+
+  return {
+    ...cajaActualizada,
+    monto_esperado,
+    cuadre_perfecto: diferencia === 0,
+  };
 };
 
 // Actualizar caja
@@ -118,14 +164,45 @@ export const updateCaja = async (id, cajaData) => {
   return data;
 };
 
-// Calcular totales de caja
+// Calcular totales de caja (sin usar función RPC)
 export const calcularTotalesCaja = async (id_caja) => {
-  const { data, error } = await supabase.rpc("calcular_totales_caja", {
-    p_caja_id: id_caja,
-  });
+  // 1. Obtener la caja
+  const { data: caja } = await supabase
+    .from("cajas")
+    .select("monto_inicial")
+    .eq("id_caja", parseInt(id_caja))
+    .single();
 
-  if (error) throw error;
-  return data && data.length > 0 ? data[0] : null;
+  if (!caja) {
+    throw new Error("Caja no encontrada");
+  }
+
+  // 2. Calcular totales de ventas
+  const { data: ventas } = await supabase
+    .from("ventas")
+    .select("valor")
+    .eq("caja_id", parseInt(id_caja))
+    .eq("activo", true);
+
+  const total_ventas = ventas?.reduce((sum, v) => sum + parseFloat(v.valor), 0) || 0;
+
+  // 3. Calcular totales de gastos
+  const { data: gastos } = await supabase
+    .from("gastos")
+    .select("valor")
+    .eq("caja_id", parseInt(id_caja))
+    .eq("activo", true);
+
+  const total_gastos = gastos?.reduce((sum, g) => sum + parseFloat(g.valor), 0) || 0;
+
+  // 4. Calcular diferencia
+  const diferencia = parseFloat(caja.monto_inicial) + total_ventas - total_gastos;
+
+  return {
+    total_ventas,
+    total_gastos,
+    diferencia,
+  };
 };
 
 // ============================================
@@ -136,16 +213,13 @@ export const calcularTotalesCaja = async (id_caja) => {
 export const getAllVentas = async (filters = {}) => {
   let query = supabase
     .from("ventas")
-    .select(`
-      *,
-      usuario:usuarios!ventas_usuario_registro_fkey(id_usuario, nombre)
-    `)
+    .select("*")
     .eq("activo", true)
     .order("fecha", { ascending: false });
 
   // Aplicar filtros
   if (filters.caja_id) {
-    query = query.eq("caja_id", filters.caja_id);
+    query = query.eq("caja_id", parseInt(filters.caja_id));
   }
   if (filters.metodo_pago) {
     query = query.eq("metodo_pago", filters.metodo_pago);
@@ -162,17 +236,14 @@ export const getAllVentas = async (filters = {}) => {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data;
+  return data || [];
 };
 
 // Obtener venta por ID
 export const getVentaById = async (id) => {
   const { data, error } = await supabase
     .from("ventas")
-    .select(`
-      *,
-      usuario:usuarios!ventas_usuario_registro_fkey(id_usuario, nombre)
-    `)
+    .select("*")
     .eq("id_venta", id)
     .single();
 
@@ -244,18 +315,13 @@ export const deleteVenta = async (id) => {
 export const getAllGastos = async (filters = {}) => {
   let query = supabase
     .from("gastos")
-    .select(`
-      *,
-      categoria:categorias_gastos!gastos_id_categoria_fkey(id_categoria, nombre),
-      subcategoria:subcategorias_gastos!gastos_id_subcategoria_fkey(id_subcategoria, nombre),
-      usuario:usuarios!gastos_usuario_registro_fkey(id_usuario, nombre)
-    `)
+    .select("*")
     .eq("activo", true)
     .order("fecha", { ascending: false });
 
   // Aplicar filtros
   if (filters.caja_id) {
-    query = query.eq("caja_id", filters.caja_id);
+    query = query.eq("caja_id", parseInt(filters.caja_id));
   }
   if (filters.id_categoria) {
     query = query.eq("id_categoria", filters.id_categoria);
@@ -275,19 +341,14 @@ export const getAllGastos = async (filters = {}) => {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data;
+  return data || [];
 };
 
 // Obtener gasto por ID
 export const getGastoById = async (id) => {
   const { data, error } = await supabase
     .from("gastos")
-    .select(`
-      *,
-      categoria:categorias_gastos!gastos_id_categoria_fkey(id_categoria, nombre),
-      subcategoria:subcategorias_gastos!gastos_id_subcategoria_fkey(id_subcategoria, nombre),
-      usuario:usuarios!gastos_usuario_registro_fkey(id_usuario, nombre)
-    `)
+    .select("*")
     .eq("id_gasto", id)
     .single();
 
