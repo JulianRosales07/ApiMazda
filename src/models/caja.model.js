@@ -43,9 +43,7 @@ export const getCajaById = async (id) => {
     .from("cajas")
     .select(`
       *,
-      usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email),
-      ventas(count),
-      gastos(count)
+      usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email)
     `)
     .eq("id_caja", id)
     .single();
@@ -140,16 +138,12 @@ export const getAllVentas = async (filters = {}) => {
     .from("ventas")
     .select(`
       *,
-      caja:cajas!ventas_caja_id_fkey(id_caja, jornada, fecha_apertura),
       usuario:usuarios!ventas_usuario_registro_fkey(id_usuario, nombre)
     `)
     .eq("activo", true)
     .order("fecha", { ascending: false });
 
   // Aplicar filtros
-  if (filters.caja_id) {
-    query = query.eq("caja_id", filters.caja_id);
-  }
   if (filters.metodo_pago) {
     query = query.eq("metodo_pago", filters.metodo_pago);
   }
@@ -174,7 +168,6 @@ export const getVentaById = async (id) => {
     .from("ventas")
     .select(`
       *,
-      caja:cajas!ventas_caja_id_fkey(id_caja, jornada, fecha_apertura),
       usuario:usuarios!ventas_usuario_registro_fkey(id_usuario, nombre)
     `)
     .eq("id_venta", id)
@@ -187,29 +180,23 @@ export const getVentaById = async (id) => {
 // Crear nueva venta
 export const createVenta = async (ventaData) => {
   const {
-    caja_id,
-    factura,
-    descripcion,
+    factura_descripcion,
     venta_por,
     valor,
     metodo_pago,
     observaciones,
     usuario_registro,
-    salida_id,
   } = ventaData;
 
   const { data, error } = await supabase
     .from("ventas")
     .insert([{
-      caja_id,
-      factura,
-      descripcion,
+      factura_descripcion,
       venta_por,
       valor,
       metodo_pago,
       observaciones,
       usuario_registro,
-      salida_id,
     }])
     .select()
     .single();
@@ -254,23 +241,19 @@ export const getAllGastos = async (filters = {}) => {
     .from("gastos")
     .select(`
       *,
-      caja:cajas!gastos_caja_id_fkey(id_caja, jornada, fecha_apertura),
-      categoria:categorias_gastos!gastos_categoria_id_fkey(id_categoria, nombre),
-      subcategoria:subcategorias_gastos(id_subcategoria, nombre),
+      categoria:categorias_gastos!gastos_id_categoria_fkey(id_categoria, nombre),
+      subcategoria:subcategorias_gastos!gastos_id_subcategoria_fkey(id_subcategoria, nombre),
       usuario:usuarios!gastos_usuario_registro_fkey(id_usuario, nombre)
     `)
     .eq("activo", true)
     .order("fecha", { ascending: false });
 
   // Aplicar filtros
-  if (filters.caja_id) {
-    query = query.eq("caja_id", filters.caja_id);
+  if (filters.id_categoria) {
+    query = query.eq("id_categoria", filters.id_categoria);
   }
-  if (filters.categoria_id) {
-    query = query.eq("categoria_id", filters.categoria_id);
-  }
-  if (filters.subcategoria_id) {
-    query = query.eq("subcategoria_id", filters.subcategoria_id);
+  if (filters.id_subcategoria) {
+    query = query.eq("id_subcategoria", filters.id_subcategoria);
   }
   if (filters.metodo_pago) {
     query = query.eq("metodo_pago", filters.metodo_pago);
@@ -293,9 +276,8 @@ export const getGastoById = async (id) => {
     .from("gastos")
     .select(`
       *,
-      caja:cajas!gastos_caja_id_fkey(id_caja, jornada, fecha_apertura),
-      categoria:categorias_gastos!gastos_categoria_id_fkey(id_categoria, nombre),
-      subcategoria:subcategorias_gastos(id_subcategoria, nombre),
+      categoria:categorias_gastos!gastos_id_categoria_fkey(id_categoria, nombre),
+      subcategoria:subcategorias_gastos!gastos_id_subcategoria_fkey(id_subcategoria, nombre),
       usuario:usuarios!gastos_usuario_registro_fkey(id_usuario, nombre)
     `)
     .eq("id_gasto", id)
@@ -308,10 +290,9 @@ export const getGastoById = async (id) => {
 // Crear nuevo gasto
 export const createGasto = async (gastoData) => {
   const {
-    caja_id,
     descripcion,
-    categoria_id,
-    subcategoria_id,
+    id_categoria,
+    id_subcategoria,
     metodo_pago,
     valor,
     usuario_registro,
@@ -320,10 +301,9 @@ export const createGasto = async (gastoData) => {
   const { data, error } = await supabase
     .from("gastos")
     .insert([{
-      caja_id,
       descripcion,
-      categoria_id,
-      subcategoria_id,
+      id_categoria,
+      id_subcategoria,
       metodo_pago,
       valor,
       usuario_registro,
@@ -419,14 +399,17 @@ export const getReporteMensual = async (anio, mes) => {
   return data;
 };
 
-// Resumen de ventas por método de pago
-export const getVentasPorMetodoPago = async (caja_id) => {
-  const { data, error } = await supabase
+// Resumen de ventas por método de pago (por fecha)
+export const getVentasPorMetodoPago = async (fecha_inicio, fecha_fin) => {
+  let query = supabase
     .from("ventas")
     .select("metodo_pago, valor")
-    .eq("caja_id", caja_id)
     .eq("activo", true);
 
+  if (fecha_inicio) query = query.gte("fecha", fecha_inicio);
+  if (fecha_fin) query = query.lte("fecha", fecha_fin);
+
+  const { data, error } = await query;
   if (error) throw error;
 
   // Agrupar por método de pago
@@ -442,17 +425,20 @@ export const getVentasPorMetodoPago = async (caja_id) => {
   return Object.values(resumen);
 };
 
-// Resumen de gastos por categoría
-export const getGastosPorCategoria = async (caja_id) => {
-  const { data, error } = await supabase
+// Resumen de gastos por categoría (por fecha)
+export const getGastosPorCategoria = async (fecha_inicio, fecha_fin) => {
+  let query = supabase
     .from("gastos")
     .select(`
       valor,
-      categoria:categorias_gastos!gastos_categoria_id_fkey(nombre)
+      categoria:categorias_gastos!gastos_id_categoria_fkey(nombre)
     `)
-    .eq("caja_id", caja_id)
     .eq("activo", true);
 
+  if (fecha_inicio) query = query.gte("fecha", fecha_inicio);
+  if (fecha_fin) query = query.lte("fecha", fecha_fin);
+
+  const { data, error } = await query;
   if (error) throw error;
 
   // Agrupar por categoría

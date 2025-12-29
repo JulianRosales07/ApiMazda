@@ -236,13 +236,23 @@ router.put("/cajas/:id", actualizarCaja);
  *     tags: [Ventas]
  *     parameters:
  *       - in: query
- *         name: caja_id
- *         schema:
- *           type: integer
- *       - in: query
  *         name: metodo_pago
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: venta_por
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: fecha_inicio
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: fecha_fin
+ *         schema:
+ *           type: string
+ *           format: date
  *     responses:
  *       200:
  *         description: Lista de ventas
@@ -493,39 +503,49 @@ router.get("/reportes/mensual", obtenerReporteMensualController);
 
 /**
  * @swagger
- * /api/caja/reportes/cajas/{caja_id}/ventas-metodo:
+ * /api/caja/reportes/ventas-metodo:
  *   get:
  *     summary: Resumen de ventas por método de pago
  *     tags: [Reportes Caja]
  *     parameters:
- *       - in: path
- *         name: caja_id
- *         required: true
+ *       - in: query
+ *         name: fecha_inicio
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: fecha_fin
+ *         schema:
+ *           type: string
+ *           format: date
  *     responses:
  *       200:
  *         description: Resumen de ventas
  */
-router.get("/reportes/cajas/:caja_id/ventas-metodo", obtenerResumenVentasPorMetodo);
+router.get("/reportes/ventas-metodo", obtenerResumenVentasPorMetodo);
 
 /**
  * @swagger
- * /api/caja/reportes/cajas/{caja_id}/gastos-categoria:
+ * /api/caja/reportes/gastos-categoria:
  *   get:
  *     summary: Resumen de gastos por categoría
  *     tags: [Reportes Caja]
  *     parameters:
- *       - in: path
- *         name: caja_id
- *         required: true
+ *       - in: query
+ *         name: fecha_inicio
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: fecha_fin
+ *         schema:
+ *           type: string
+ *           format: date
  *     responses:
  *       200:
  *         description: Resumen de gastos
  */
-router.get("/reportes/cajas/:caja_id/gastos-categoria", obtenerResumenGastosPorCategoria);
+router.get("/reportes/gastos-categoria", obtenerResumenGastosPorCategoria);
 
 // ============================================
 // RUTAS DE CAJA FUERTE

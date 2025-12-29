@@ -136,10 +136,10 @@ export const obtenerTotalesCaja = async (req, res) => {
 // CONTROLADORES DE VENTAS
 // ============================================
 
+// Obtener todas las ventas
 export const obtenerVentas = async (req, res) => {
   try {
     const filters = {
-      caja_id: req.query.caja_id,
       metodo_pago: req.query.metodo_pago,
       venta_por: req.query.venta_por,
       fecha_inicio: req.query.fecha_inicio,
@@ -193,12 +193,12 @@ export const eliminarVenta = async (req, res) => {
 // CONTROLADORES DE GASTOS
 // ============================================
 
+// Obtener todos los gastos
 export const obtenerGastos = async (req, res) => {
   try {
     const filters = {
-      caja_id: req.query.caja_id,
-      categoria_id: req.query.categoria_id,
-      subcategoria_id: req.query.subcategoria_id,
+      id_categoria: req.query.id_categoria,
+      id_subcategoria: req.query.id_subcategoria,
       metodo_pago: req.query.metodo_pago,
       fecha_inicio: req.query.fecha_inicio,
       fecha_fin: req.query.fecha_fin,
@@ -296,18 +296,22 @@ export const obtenerReporteMensualController = async (req, res) => {
   }
 };
 
+// Resumen de ventas por método de pago
 export const obtenerResumenVentasPorMetodo = async (req, res) => {
   try {
-    const data = await getVentasPorMetodoPago(req.params.caja_id);
+    const { fecha_inicio, fecha_fin } = req.query;
+    const data = await getVentasPorMetodoPago(fecha_inicio, fecha_fin);
     success(res, data);
   } catch (err) {
     error(res, err);
   }
 };
 
+// Resumen de gastos por categoría
 export const obtenerResumenGastosPorCategoria = async (req, res) => {
   try {
-    const data = await getGastosPorCategoria(req.params.caja_id);
+    const { fecha_inicio, fecha_fin } = req.query;
+    const data = await getGastosPorCategoria(fecha_inicio, fecha_fin);
     success(res, data);
   } catch (err) {
     error(res, err);
