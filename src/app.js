@@ -11,6 +11,11 @@ import productoProveedorRoutes from "./routes/productoProveedor.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import historialPreciosRoutes from "./routes/historialPrecios.routes.js";
 import cajaRoutes from "./routes/caja.routes.js";
+import ventasRoutes from "./routes/ventas.routes.js";
+import gastosRoutes from "./routes/gastos.routes.js";
+import categoriasRoutes from "./routes/categorias.routes.js";
+import cajaFuerteRoutes from "./routes/cajaFuerte.routes.js";
+import reportesRoutes from "./routes/reportes.routes.js";
 
 const app = express();
 
@@ -277,5 +282,10 @@ app.use("/api/proveedores", proveedorRoutes);
 app.use("/api/producto-proveedor", productoProveedorRoutes);
 app.use("/api/historial-precios", historialPreciosRoutes);
 app.use("/api/caja", cajaRoutes);
+app.use("/api/ventas", ventasRoutes);
+app.use("/api/gastos", gastosRoutes);
+app.use("/api/categorias", categoriasRoutes);
+app.use("/api/caja-fuerte", cajaFuerteRoutes);
+app.use("/api/reportes", reportesRoutes);
 
 export default app;
