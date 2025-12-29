@@ -140,6 +140,7 @@ export const obtenerTotalesCaja = async (req, res) => {
 export const obtenerVentas = async (req, res) => {
   try {
     const filters = {
+      caja_id: req.query.caja_id,
       metodo_pago: req.query.metodo_pago,
       venta_por: req.query.venta_por,
       fecha_inicio: req.query.fecha_inicio,
@@ -197,6 +198,7 @@ export const eliminarVenta = async (req, res) => {
 export const obtenerGastos = async (req, res) => {
   try {
     const filters = {
+      caja_id: req.query.caja_id,
       id_categoria: req.query.id_categoria,
       id_subcategoria: req.query.id_subcategoria,
       metodo_pago: req.query.metodo_pago,

@@ -144,6 +144,9 @@ export const getAllVentas = async (filters = {}) => {
     .order("fecha", { ascending: false });
 
   // Aplicar filtros
+  if (filters.caja_id) {
+    query = query.eq("caja_id", filters.caja_id);
+  }
   if (filters.metodo_pago) {
     query = query.eq("metodo_pago", filters.metodo_pago);
   }
@@ -186,6 +189,7 @@ export const createVenta = async (ventaData) => {
     metodo_pago,
     observaciones,
     usuario_registro,
+    caja_id, // Opcional
   } = ventaData;
 
   const { data, error } = await supabase
@@ -197,6 +201,7 @@ export const createVenta = async (ventaData) => {
       metodo_pago,
       observaciones,
       usuario_registro,
+      caja_id: caja_id || null,
     }])
     .select()
     .single();
@@ -249,6 +254,9 @@ export const getAllGastos = async (filters = {}) => {
     .order("fecha", { ascending: false });
 
   // Aplicar filtros
+  if (filters.caja_id) {
+    query = query.eq("caja_id", filters.caja_id);
+  }
   if (filters.id_categoria) {
     query = query.eq("id_categoria", filters.id_categoria);
   }
@@ -296,6 +304,7 @@ export const createGasto = async (gastoData) => {
     metodo_pago,
     valor,
     usuario_registro,
+    caja_id, // Opcional
   } = gastoData;
 
   const { data, error } = await supabase
@@ -307,6 +316,7 @@ export const createGasto = async (gastoData) => {
       metodo_pago,
       valor,
       usuario_registro,
+      caja_id: caja_id || null,
     }])
     .select()
     .single();

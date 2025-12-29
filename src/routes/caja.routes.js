@@ -236,6 +236,10 @@ router.put("/cajas/:id", actualizarCaja);
  *     tags: [Ventas]
  *     parameters:
  *       - in: query
+ *         name: caja_id
+ *         schema:
+ *           type: integer
+ *       - in: query
  *         name: metodo_pago
  *         schema:
  *           type: string
