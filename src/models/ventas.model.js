@@ -113,11 +113,16 @@ export const deleteVenta = async (id) => {
     .from("ventas")
     .update({ activo: false })
     .eq("id_venta", id)
-    .select()
-    .single();
+    .select();
 
   if (error) throw error;
-  return data;
+  
+  // Verificar que se eliminó algo
+  if (!data || data.length === 0) {
+    throw new Error('Venta no encontrada');
+  }
+  
+  return data[0];
 };
 
 // Obtener ventas por período

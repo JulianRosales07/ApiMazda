@@ -118,11 +118,16 @@ export const deleteGasto = async (id) => {
     .from("gastos")
     .update({ activo: false })
     .eq("id_gasto", id)
-    .select()
-    .single();
+    .select();
 
   if (error) throw error;
-  return data;
+  
+  // Verificar que se eliminó algo
+  if (!data || data.length === 0) {
+    throw new Error('Gasto no encontrado');
+  }
+  
+  return data[0];
 };
 
 // Obtener gastos por categoría
