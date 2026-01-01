@@ -58,6 +58,19 @@ export const registrarGasto = async (gastoData) => {
     usuario_registro,
   } = gastoData;
 
+  // Obtener la caja abierta del usuario
+  const { data: cajaAbierta } = await supabase
+    .from("cajas")
+    .select("id_caja")
+    .eq("usuario_id", usuario_registro)
+    .eq("estado", "abierta")
+    .eq("activo", true)
+    .order("fecha_apertura", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const caja_id = cajaAbierta?.id_caja || null;
+
   const { data, error } = await supabase.rpc("registrar_gasto", {
     p_descripcion: descripcion,
     p_id_categoria: id_categoria,
@@ -68,6 +81,21 @@ export const registrarGasto = async (gastoData) => {
   });
 
   if (error) throw error;
+  
+  // Si se creó el gasto y hay una caja abierta, actualizar el caja_id
+  if (data && data.length > 0 && caja_id) {
+    const gastoCreado = data[0];
+    const { data: gastoActualizado, error: updateError } = await supabase
+      .from("gastos")
+      .update({ caja_id })
+      .eq("id_gasto", gastoCreado.id_gasto)
+      .select()
+      .single();
+    
+    if (updateError) throw updateError;
+    return gastoActualizado;
+  }
+  
   return data && data.length > 0 ? data[0] : null;
 };
 

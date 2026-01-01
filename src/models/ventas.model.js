@@ -53,6 +53,19 @@ export const registrarVenta = async (ventaData) => {
     observaciones,
   } = ventaData;
 
+  // Obtener la caja abierta del usuario
+  const { data: cajaAbierta } = await supabase
+    .from("cajas")
+    .select("id_caja")
+    .eq("usuario_id", usuario_registro)
+    .eq("estado", "abierta")
+    .eq("activo", true)
+    .order("fecha_apertura", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const caja_id = cajaAbierta?.id_caja || null;
+
   const { data, error } = await supabase.rpc("registrar_venta", {
     p_factura_descripcion: factura_descripcion,
     p_venta_por: venta_por,
@@ -63,6 +76,21 @@ export const registrarVenta = async (ventaData) => {
   });
 
   if (error) throw error;
+  
+  // Si se creó la venta y hay una caja abierta, actualizar el caja_id
+  if (data && data.length > 0 && caja_id) {
+    const ventaCreada = data[0];
+    const { data: ventaActualizada, error: updateError } = await supabase
+      .from("ventas")
+      .update({ caja_id })
+      .eq("id_venta", ventaCreada.id_venta)
+      .select()
+      .single();
+    
+    if (updateError) throw updateError;
+    return ventaActualizada;
+  }
+  
   return data && data.length > 0 ? data[0] : null;
 };
 
