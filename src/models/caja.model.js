@@ -8,7 +8,10 @@ import { supabase } from "../config/db.js";
 export const getAllCajas = async (filters = {}) => {
   let query = supabase
     .from("cajas")
-    .select("*")
+    .select(`
+      *,
+      usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email)
+    `)
     .eq("activo", true)
     .order("fecha_apertura", { ascending: false });
 
@@ -31,18 +34,39 @@ export const getAllCajas = async (filters = {}) => {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data || [];
+
+  // Transformar los datos para incluir usuario_nombre
+  const cajasConUsuario = (data || []).map(caja => ({
+    ...caja,
+    usuario_nombre: caja.usuario?.nombre || 'Usuario Desconocido',
+    usuario_email: caja.usuario?.email || null
+  }));
+
+  return cajasConUsuario;
 };
 
 // Obtener caja por ID
 export const getCajaById = async (id) => {
   const { data, error } = await supabase
     .from("cajas")
-    .select("*")
+    .select(`
+      *,
+      usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email)
+    `)
     .eq("id_caja", parseInt(id))
     .single();
 
   if (error) throw error;
+
+  // Agregar campos de usuario
+  if (data) {
+    return {
+      ...data,
+      usuario_nombre: data.usuario?.nombre || 'Usuario Desconocido',
+      usuario_email: data.usuario?.email || null
+    };
+  }
+
   return data;
 };
 
@@ -50,7 +74,10 @@ export const getCajaById = async (id) => {
 export const getCajaAbierta = async (usuario_id) => {
   const { data, error } = await supabase
     .from("cajas")
-    .select("*")
+    .select(`
+      *,
+      usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email)
+    `)
     .eq("usuario_id", usuario_id)
     .eq("estado", "abierta")
     .eq("activo", true)
@@ -59,6 +86,16 @@ export const getCajaAbierta = async (usuario_id) => {
     .maybeSingle();
 
   if (error) throw error;
+
+  // Agregar campos de usuario
+  if (data) {
+    return {
+      ...data,
+      usuario_nombre: data.usuario?.nombre || 'Usuario Desconocido',
+      usuario_email: data.usuario?.email || null
+    };
+  }
+
   return data;
 };
 

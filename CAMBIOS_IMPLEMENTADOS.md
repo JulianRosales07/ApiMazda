@@ -339,6 +339,72 @@ Si encuentras algún error después de implementar estos cambios:
 
 ---
 
-**Fecha de implementación:** Diciembre 2024  
+### 6. ✅ FIX: Usuario muestra "N/A" en Historial de Cajas
+
+**Problema:** En el modal de exportación de historial de cajas, el campo "Usuario" mostraba "N/A" en lugar del nombre del usuario.
+
+**Causa:** El endpoint `/api/caja/cajas` no estaba devolviendo la información del usuario (nombre). Solo devolvía el `usuario_id` pero no hacía JOIN con la tabla `usuarios`.
+
+**Solución:** Agregado JOIN con la tabla `usuarios` en las funciones del modelo de cajas.
+
+**Archivos modificados:**
+- `src/models/caja.model.js`
+
+**Funciones corregidas:**
+
+1. **getAllCajas()** - Ahora incluye JOIN con usuarios:
+```javascript
+.select(`
+  *,
+  usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email)
+`)
+```
+
+2. **getCajaById()** - Ahora incluye información del usuario:
+```javascript
+.select(`
+  *,
+  usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email)
+`)
+```
+
+3. **getCajaAbierta()** - Ahora incluye información del usuario:
+```javascript
+.select(`
+  *,
+  usuario:usuarios!cajas_usuario_id_fkey(id_usuario, nombre, email)
+`)
+```
+
+**Transformación de datos:**
+Todas las funciones ahora transforman los datos para incluir:
+- `usuario_nombre`: Nombre del usuario o "Usuario Desconocido"
+- `usuario_email`: Email del usuario o null
+
+**Estructura de respuesta:**
+```json
+{
+  "id_caja": 12,
+  "usuario_id": 5,
+  "usuario_nombre": "Juan Pérez",  // ← ✅ NUEVO
+  "usuario_email": "juan@example.com",  // ← ✅ NUEVO
+  "fecha_apertura": "2024-01-15T08:00:00",
+  "monto_inicial": 100000,
+  "usuario": {
+    "id_usuario": 5,
+    "nombre": "Juan Pérez",
+    "email": "juan@example.com"
+  }
+}
+```
+
+**Resultado:**
+- ✅ El historial de cajas ahora muestra el nombre del usuario correctamente
+- ✅ Ya no aparece "N/A" en el campo Usuario
+- ✅ Se mantiene compatibilidad con el frontend existente
+
+---
+
+**Fecha de implementación:** Enero 2026  
 **Estado:** ✅ COMPLETADO  
 **Prioridad:** ALTA
