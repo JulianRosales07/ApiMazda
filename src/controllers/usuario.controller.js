@@ -36,15 +36,6 @@ export const crearUsuario = async (req, res) => {
   try {
     const { nombre, email, password, rol, rol_usuario_actual } = req.body;
 
-    // VALIDACIÓN DE ROL: Solo administradores pueden crear usuarios
-    if (rol_usuario_actual !== "administrador") {
-      return error(
-        res,
-        { message: "Acceso denegado. Solo administradores pueden crear usuarios" },
-        403
-      );
-    }
-
     // Validar campos requeridos
     if (!nombre || !email || !password) {
       return error(res, { message: "Nombre, email y password son requeridos" }, 400);
@@ -56,6 +47,22 @@ export const crearUsuario = async (req, res) => {
       return error(res, { message: "El email ya está registrado" }, 400);
     }
 
+    // VALIDACIÓN DE ROL: Solo administradores pueden asignar el rol de administrador
+    // Si no es admin o no se proporciona rol, se asigna "usuario" por defecto
+    let rolAsignado = "usuario";
+    if (rol === "administrador") {
+      if (rol_usuario_actual !== "administrador") {
+        return error(
+          res,
+          { message: "Solo administradores pueden crear usuarios con rol de administrador" },
+          403
+        );
+      }
+      rolAsignado = "administrador";
+    } else if (rol === "usuario") {
+      rolAsignado = "usuario";
+    }
+
     // Encriptar contraseña
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -65,7 +72,7 @@ export const crearUsuario = async (req, res) => {
       nombre,
       email,
       password: hashedPassword,
-      rol: rol || "usuario",
+      rol: rolAsignado,
     });
 
     success(res, nuevoUsuario, "Usuario creado correctamente");
