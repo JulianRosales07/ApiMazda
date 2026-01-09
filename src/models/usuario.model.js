@@ -29,7 +29,7 @@ export const getUsuarioByEmail = async (email) => {
     .from("usuarios")
     .select("*")
     .eq("email", email)
-    .single();
+    .maybeSingle();
   
   if (error) throw error;
   return data;
