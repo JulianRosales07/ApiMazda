@@ -47,20 +47,39 @@ export const crearUsuario = async (req, res) => {
       return error(res, { message: "El email ya está registrado" }, 400);
     }
 
-    // VALIDACIÓN DE ROL: Solo administradores pueden asignar el rol de administrador
-    // Si no es admin o no se proporciona rol, se asigna "usuario" por defecto
-    let rolAsignado = "usuario";
-    if (rol === "administrador") {
-      if (rol_usuario_actual !== "administrador") {
-        return error(
-          res,
-          { message: "Solo administradores pueden crear usuarios con rol de administrador" },
-          403
-        );
+    // Roles permitidos según el esquema de la base de datos
+    const rolesPermitidos = [
+      'administrador',
+      'usuario',
+      'administrador_general',
+      'gestion_ingresos',
+      'gestion_egresos',
+      'gestion_inventario'
+    ];
+
+    // VALIDACIÓN DE ROL: Solo administradores pueden asignar roles especiales
+    let rolAsignado = "usuario"; // Por defecto
+    
+    if (rol && rolesPermitidos.includes(rol)) {
+      // Si se intenta asignar un rol diferente a "usuario"
+      if (rol !== "usuario") {
+        // Verificar que quien crea el usuario sea administrador
+        if (rol_usuario_actual !== "administrador" && rol_usuario_actual !== "administrador_general") {
+          return error(
+            res,
+            { message: "Solo administradores pueden asignar roles especiales" },
+            403
+          );
+        }
       }
-      rolAsignado = "administrador";
-    } else if (rol === "usuario") {
-      rolAsignado = "usuario";
+      rolAsignado = rol;
+    } else if (rol) {
+      // Si se envió un rol pero no es válido
+      return error(
+        res,
+        { message: `Rol inválido. Roles permitidos: ${rolesPermitidos.join(', ')}` },
+        400
+      );
     }
 
     // Encriptar contraseña

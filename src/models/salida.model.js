@@ -133,8 +133,7 @@ export const deleteSalida = async (n_factura) => {
   const { data, error } = await supabase
     .from("salidas")
     .delete()
-    .eq("n_factura", n_factura)
-    .select();
+    .eq("n_factura", n_factura);
   
   if (error) throw error;
   return data;
