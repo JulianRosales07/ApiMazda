@@ -34,7 +34,7 @@ export const getSalidaById = async (id) => {
     .from("salidas")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
   
   if (error) throw error;
   return data;

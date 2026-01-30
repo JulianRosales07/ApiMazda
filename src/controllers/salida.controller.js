@@ -35,10 +35,20 @@ export const obtenerSalidas = async (req, res) => {
   }
 };
 
-// Obtener una salida por ID
+// Obtener una salida por ID o n_factura (compatibilidad)
 export const obtenerSalida = async (req, res) => {
   try {
-    const data = await getSalidaById(req.params.id);
+    const { id } = req.params;
+    
+    // Intentar primero por ID numérico
+    let data = await getSalidaById(id);
+    
+    // Si no se encuentra por ID, intentar por n_factura (compatibilidad)
+    if (!data) {
+      const salidas = await getSalidaByFactura(id);
+      data = salidas && salidas.length > 0 ? salidas[0] : null;
+    }
+    
     if (!data) return error(res, { message: "Salida no encontrada" }, 404);
     success(res, data);
   } catch (err) {
@@ -77,36 +87,52 @@ export const crearSalida = async (req, res) => {
   }
 };
 
-// Actualizar una salida por ID
+// Actualizar una salida por ID o n_factura (compatibilidad)
 export const actualizarSalida = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Verificar si la salida existe
-    const salidaExistente = await getSalidaById(id);
+    // Intentar primero por ID
+    let salidaExistente = await getSalidaById(id);
+    
+    // Si no se encuentra por ID, intentar por n_factura
+    if (!salidaExistente) {
+      const salidas = await getSalidaByFactura(id);
+      salidaExistente = salidas && salidas.length > 0 ? salidas[0] : null;
+    }
+    
     if (!salidaExistente) {
       return error(res, { message: "Salida no encontrada" }, 404);
     }
 
-    await updateSalida(id, req.body);
+    // Actualizar usando el ID real del registro encontrado
+    await updateSalida(salidaExistente.id, req.body);
     success(res, null, "Salida actualizada correctamente");
   } catch (err) {
     error(res, err);
   }
 };
 
-// Eliminar una salida por ID
+// Eliminar una salida por ID o n_factura (compatibilidad)
 export const eliminarSalida = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Verificar si la salida existe
-    const salidaExistente = await getSalidaById(id);
+    // Intentar primero por ID
+    let salidaExistente = await getSalidaById(id);
+    
+    // Si no se encuentra por ID, intentar por n_factura
+    if (!salidaExistente) {
+      const salidas = await getSalidaByFactura(id);
+      salidaExistente = salidas && salidas.length > 0 ? salidas[0] : null;
+    }
+    
     if (!salidaExistente) {
       return error(res, { message: "Salida no encontrada" }, 404);
     }
 
-    await deleteSalida(id);
+    // Eliminar usando el ID real del registro encontrado
+    await deleteSalida(salidaExistente.id);
     success(res, null, "Salida eliminada correctamente");
   } catch (err) {
     error(res, err);
