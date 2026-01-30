@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   obtenerSalidas,
   obtenerSalida,
+  obtenerSalidasPorFactura,
   crearSalida,
   actualizarSalida,
   eliminarSalida,
@@ -34,9 +35,9 @@ router.get("/", obtenerSalidas);
 
 /**
  * @swagger
- * /api/salidas/{n_factura}:
+ * /api/salidas/factura/{n_factura}:
  *   get:
- *     summary: Obtener una salida por número de factura
+ *     summary: Obtener salidas por número de factura
  *     tags: [Salidas]
  *     parameters:
  *       - in: path
@@ -46,11 +47,31 @@ router.get("/", obtenerSalidas);
  *           type: string
  *     responses:
  *       200:
+ *         description: Salidas encontradas
+ *       404:
+ *         description: No se encontraron salidas
+ */
+router.get("/factura/:n_factura", obtenerSalidasPorFactura);
+
+/**
+ * @swagger
+ * /api/salidas/{id}:
+ *   get:
+ *     summary: Obtener una salida por ID
+ *     tags: [Salidas]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
  *         description: Salida encontrada
  *       404:
  *         description: Salida no encontrada
  */
-router.get("/:n_factura", obtenerSalida);
+router.get("/:id", obtenerSalida);
 
 /**
  * @swagger
@@ -87,16 +108,16 @@ router.post("/", crearSalida);
 
 /**
  * @swagger
- * /api/salidas/{n_factura}:
+ * /api/salidas/{id}:
  *   put:
- *     summary: Actualizar una salida
+ *     summary: Actualizar una salida por ID
  *     tags: [Salidas]
  *     parameters:
  *       - in: path
- *         name: n_factura
+ *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -107,24 +128,24 @@ router.post("/", crearSalida);
  *       200:
  *         description: Salida actualizada
  */
-router.put("/:n_factura", actualizarSalida);
+router.put("/:id", actualizarSalida);
 
 /**
  * @swagger
- * /api/salidas/{n_factura}:
+ * /api/salidas/{id}:
  *   delete:
- *     summary: Eliminar una salida
+ *     summary: Eliminar una salida por ID
  *     tags: [Salidas]
  *     parameters:
  *       - in: path
- *         name: n_factura
+ *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Salida eliminada
  */
-router.delete("/:n_factura", eliminarSalida);
+router.delete("/:id", eliminarSalida);
 
 export default router;

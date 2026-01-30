@@ -28,13 +28,24 @@ export const getAllSalidas = async () => {
   return allData;
 };
 
-// Obtener una salida por número de factura
+// Obtener una salida por ID
+export const getSalidaById = async (id) => {
+  const { data, error } = await supabase
+    .from("salidas")
+    .select("*")
+    .eq("id", id)
+    .single();
+  
+  if (error) throw error;
+  return data;
+};
+
+// Obtener salidas por número de factura (puede haber múltiples)
 export const getSalidaByFactura = async (n_factura) => {
   const { data, error } = await supabase
     .from("salidas")
     .select("*")
-    .eq("n_factura", n_factura)
-    .single();
+    .eq("n_factura", n_factura);
   
   if (error) throw error;
   return data;
@@ -96,10 +107,10 @@ export const createSalida = async (salida) => {
   return data;
 };
 
-// Actualizar una salida
-export const updateSalida = async (n_factura, salida) => {
+// Actualizar una salida por ID
+export const updateSalida = async (id, salida) => {
   const {
-    n_factura: new_n_factura,
+    n_factura,
     fecha,
     cb,
     ci,
@@ -109,10 +120,10 @@ export const updateSalida = async (n_factura, salida) => {
     columna1,
   } = salida;
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("salidas")
     .update({
-      n_factura: new_n_factura,
+      n_factura,
       fecha,
       cb,
       ci,
@@ -121,19 +132,18 @@ export const updateSalida = async (n_factura, salida) => {
       cantidad,
       columna1,
     })
-    .eq("n_factura", n_factura)
-    .select();
+    .eq("id", id);
 
   if (error) throw error;
-  return data;
+  return { success: true };
 };
 
-// Eliminar una salida
-export const deleteSalida = async (n_factura) => {
+// Eliminar una salida por ID
+export const deleteSalida = async (id) => {
   const { error } = await supabase
     .from("salidas")
     .delete()
-    .eq("n_factura", n_factura);
+    .eq("id", id);
   
   if (error) throw error;
   return { success: true };

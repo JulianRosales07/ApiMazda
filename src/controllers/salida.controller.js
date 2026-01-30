@@ -1,5 +1,6 @@
 import {
   getAllSalidas,
+  getSalidaById,
   getSalidaByFactura,
   getSalidasByCB,
   getSalidasByFecha,
@@ -34,11 +35,24 @@ export const obtenerSalidas = async (req, res) => {
   }
 };
 
-// Obtener una salida por número de factura
+// Obtener una salida por ID
 export const obtenerSalida = async (req, res) => {
   try {
-    const data = await getSalidaByFactura(req.params.n_factura);
+    const data = await getSalidaById(req.params.id);
     if (!data) return error(res, { message: "Salida no encontrada" }, 404);
+    success(res, data);
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+// Obtener salidas por número de factura
+export const obtenerSalidasPorFactura = async (req, res) => {
+  try {
+    const data = await getSalidaByFactura(req.params.n_factura);
+    if (!data || data.length === 0) {
+      return error(res, { message: "No se encontraron salidas con ese número de factura" }, 404);
+    }
     success(res, data);
   } catch (err) {
     error(res, err);
@@ -63,36 +77,36 @@ export const crearSalida = async (req, res) => {
   }
 };
 
-// Actualizar una salida
+// Actualizar una salida por ID
 export const actualizarSalida = async (req, res) => {
   try {
-    const { n_factura } = req.params;
+    const { id } = req.params;
 
     // Verificar si la salida existe
-    const salidaExistente = await getSalidaByFactura(n_factura);
+    const salidaExistente = await getSalidaById(id);
     if (!salidaExistente) {
       return error(res, { message: "Salida no encontrada" }, 404);
     }
 
-    await updateSalida(n_factura, req.body);
+    await updateSalida(id, req.body);
     success(res, null, "Salida actualizada correctamente");
   } catch (err) {
     error(res, err);
   }
 };
 
-// Eliminar una salida
+// Eliminar una salida por ID
 export const eliminarSalida = async (req, res) => {
   try {
-    const { n_factura } = req.params;
+    const { id } = req.params;
 
     // Verificar si la salida existe
-    const salidaExistente = await getSalidaByFactura(n_factura);
+    const salidaExistente = await getSalidaById(id);
     if (!salidaExistente) {
       return error(res, { message: "Salida no encontrada" }, 404);
     }
 
-    await deleteSalida(n_factura);
+    await deleteSalida(id);
     success(res, null, "Salida eliminada correctamente");
   } catch (err) {
     error(res, err);
