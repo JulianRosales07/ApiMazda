@@ -130,11 +130,11 @@ export const updateSalida = async (n_factura, salida) => {
 
 // Eliminar una salida
 export const deleteSalida = async (n_factura) => {
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("salidas")
     .delete()
     .eq("n_factura", n_factura);
   
   if (error) throw error;
-  return data;
+  return { success: true };
 };
