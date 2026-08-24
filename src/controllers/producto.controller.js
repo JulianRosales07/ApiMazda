@@ -40,7 +40,14 @@ export const obtenerRepuesto = async (req, res) => {
 
 export const crearRepuesto = async (req, res) => {
   try {
-    const nuevo = await createRepuesto(req.body);
+    const repuestoData = { ...req.body };
+
+    // Asegurar que el CB numérico tenga el 0 inicial (ej: 01010365)
+    if (repuestoData.cb && /^\d+$/.test(repuestoData.cb)) {
+      repuestoData.cb = String(repuestoData.cb).padStart(8, "0");
+    }
+
+    const nuevo = await createRepuesto(repuestoData);
     success(res, nuevo, "Repuesto creado correctamente");
   } catch (err) {
     // Error de clave duplicada (PostgreSQL 23505)
@@ -87,10 +94,23 @@ export const eliminarRepuesto = async (req, res) => {
 export const obtenerMaxCodes = async (req, res) => {
   try {
     const data = await getMaxCodes();
-    success(res, {
-      maxCI: data.max_ci,
-      maxCB: data.max_cb
-    }, "Operación exitosa");
+    const maxCI = data.max_ci;
+    const maxCB = data.max_cb;
+
+    // Próximos códigos sugeridos
+    const nextCB = String(maxCB + 1).padStart(8, "0");
+    const nextCI = maxCI + 1;
+
+    success(
+      res,
+      {
+        maxCI,
+        maxCB: String(maxCB).padStart(8, "0"),
+        nextCI,
+        nextCB,
+      },
+      "Operación exitosa"
+    );
   } catch (err) {
     error(res, err);
   }
