@@ -298,11 +298,26 @@ export const getMaxCodes = async () => {
     if (ciError || cbError) throw ciError || cbError;
     
     // Convertir a números y aplicar valores por defecto
-    const maxCI = ciData && ciData.length > 0 ? parseInt(ciData[0].ci) || 100000 : 100000;
-    const maxCB = cbData && cbData.length > 0 ? parseInt(cbData[0].cb) || 1000000 : 1000000;
+    const maxCI = ciData && ciData.length > 0 ? parseInt(ciData[0].ci, 10) || 100000 : 100000;
+    const maxCB = cbData && cbData.length > 0 ? parseInt(cbData[0].cb, 10) || 1000000 : 1000000;
     
     return { max_ci: maxCI, max_cb: maxCB };
   }
   
-  return data;
+  // Si la RPC devuelve un arreglo con un objeto, extraer el primer elemento
+  if (Array.isArray(data) && data.length > 0) {
+    return {
+      max_ci: parseInt(data[0].max_ci, 10) || 100000,
+      max_cb: parseInt(data[0].max_cb, 10) || 1000000
+    };
+  }
+  
+  if (data && typeof data === 'object') {
+    return {
+      max_ci: parseInt(data.max_ci, 10) || 100000,
+      max_cb: parseInt(data.max_cb, 10) || 1000000
+    };
+  }
+
+  return { max_ci: 100000, max_cb: 1000000 };
 };

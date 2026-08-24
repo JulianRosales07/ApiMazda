@@ -43,11 +43,22 @@ export const crearRepuesto = async (req, res) => {
     const nuevo = await createRepuesto(req.body);
     success(res, nuevo, "Repuesto creado correctamente");
   } catch (err) {
-    // Error de clave duplicada (código de barras ya existe)
+    // Error de clave duplicada (PostgreSQL 23505)
     if (err.code === "23505") {
+      const detail = (err.details || err.detail || err.message || "").toLowerCase();
+      let message = "Ya existe un registro con estos datos únicos";
+
+      if (detail.includes("cb") || detail.includes("pkey")) {
+        message = "El código de barras (CB) ya existe en el sistema (puede estar inactivo o eliminado)";
+      } else if (detail.includes("ci")) {
+        message = "El código interno (CI) ya existe en el sistema";
+      } else if (err.details || err.detail) {
+        message = `Registro duplicado: ${err.details || err.detail}`;
+      }
+
       return error(
         res,
-        { message: "El código de barras (CB) ya existe en el sistema" },
+        { message, details: err.details || err.detail },
         400
       );
     }
